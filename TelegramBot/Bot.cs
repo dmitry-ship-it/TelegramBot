@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -21,62 +22,61 @@ namespace TelegramBot
             _logger = new Logging.Logger<Bot>(() => new Logging.LoggerConfiguration());
         }
 
-        public static Bot GetInstance()
-        {
-            return _instance ??= new();
-        }
+        public static Bot Instance => _instance ??= new();
 
         private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             // update handling
-
-            if (update?.Message?.Chat is not null)
+            if (update?.Message?.Chat is null)
             {
-                try
+                return;
+            }
+
+            try
+            {
+                _logger.LogInformation($"Message from {update.Message.From}. Content: {update.Message.Text ?? "null"}");
+
+                #if DEBUG
+                    _logger.LogDebug(JsonSerializer.Serialize(update));
+                #endif
+
+                var command = Command.Create(update.Message.Text);
+
+                if (command.ReplySticker is null)
                 {
-                    _logger.LogInformation($"Message from {update.Message.From}. Content: {update.Message.Text ?? "null"}");
-
-                    #if DEBUG
-                        _logger.LogDebug(Newtonsoft.Json.JsonConvert.SerializeObject(update));
-                    #endif
-
-                    var command = Command.Create(update.Message.Text);
-
-                    if (command.ReplySticker is not null)
-                    {
-                        await botClient.SendStickerAsync(
-                            chatId: update.Message.Chat!,
-                            sticker: command.ReplySticker,
-                            replyToMessageId: update.Message.MessageId,
-                            cancellationToken: cancellationToken);
-                    }
-                    else
-                    {
-                        await botClient.SendTextMessageAsync(
-                            chatId: update.Message.Chat!,
-                            text: command.ReplyMessage,
-                            parseMode: ParseMode.Html,
-                            replyToMessageId: update.Message.MessageId,
-                            cancellationToken: cancellationToken);
-                    }
-
-                    _logger.LogInformation($"Command {command.GetType()} executed successfully.");
+                    await botClient.SendTextMessageAsync(
+                        chatId: update.Message.Chat!,
+                        text: command.ReplyMessage,
+                        parseMode: ParseMode.Html,
+                        replyToMessageId: update.Message.MessageId,
+                        cancellationToken: cancellationToken);
                 }
-                catch (ApiRequestException ex)
+                else
                 {
-                    _logger.LogError($"Telegram API request error: {ex.Message}");
+                    await botClient.SendStickerAsync(
+                        chatId: update.Message.Chat!,
+                        sticker: command.ReplySticker,
+                        replyToMessageId: update.Message.MessageId,
+                        cancellationToken: cancellationToken);
                 }
-                catch (ArgumentException ex)
-                {
-                    _logger.LogDebug($"{ex.GetType()}: {ex.Message}");
-                }
+
+                _logger.LogInformation($"Command {command.GetType()} executed successfully.");
+            }
+            catch (ApiRequestException ex)
+            {
+                _logger.LogError($"Telegram API request error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug($"{ex.GetType()}: {ex.Message}");
             }
         }
 
         private async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
             // remove creating new task after adding something awaitable there 
-            await Task.Factory.StartNew(() => _logger.LogError($"{exception.GetType()}: {exception.Message}"), cancellationToken);
+            await Task.Factory.StartNew(() =>
+                _logger.LogError($"{exception.GetType()}: {exception.Message}"), cancellationToken);
         }
 
         public void Start(Action<ReceiverOptions>? options = null, CancellationToken cancellationToken = default)

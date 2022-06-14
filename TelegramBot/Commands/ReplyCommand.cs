@@ -3,7 +3,7 @@ using TelegramBot.Configs;
 
 namespace TelegramBot.Commands
 {
-    public class ReplyCommand : Command
+    public class ReplyCommand : Command // TODO: Add unit tests
     {
         public override string ReplyMessage => string.Empty;
 

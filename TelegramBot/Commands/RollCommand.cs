@@ -5,7 +5,7 @@ namespace TelegramBot.Commands
     /// <summary>
     /// Commands: <b>/roll</b>
     /// </summary>
-    public class RollCommand : Command
+    public class RollCommand : Command // TODO: Add unit tests
     {
         public override string ReplyMessage => $"Случайное число (1-100):{Environment.NewLine}{Random.Shared.Next(1, 101)}";
 

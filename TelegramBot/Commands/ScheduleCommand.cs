@@ -8,7 +8,7 @@ namespace TelegramBot.Commands
     /// <summary>
     /// Commands: <b>/р</b>, <b>/расп</b>, <b>/расписание</b>, <b>/r</b>, <b>/rasp</b>, <b>/timetable</b>, <b>/schedule</b>
     /// </summary>
-    public sealed class ScheduleCommand : Command
+    public sealed class ScheduleCommand : Command // TODO: Add unit tests
     {
         public override string ReplyMessage => GetSchedule();
 
@@ -23,7 +23,7 @@ namespace TelegramBot.Commands
         private static string GetSchedule()
         {
             using var client = new HttpClient();
-            var html = client.GetStringAsync(Configuration.Instance.ScheduleConfing!.TimeTableUrl).Result;
+            var html = client.GetStringAsync(Configuration.Instance.ScheduleConfing!.ScheduleUrl).Result;
 
             return ParseHtml(html);
         }
@@ -40,7 +40,7 @@ namespace TelegramBot.Commands
                 sb.Append("> ");
                 sb.Append(item.Insert(
                     startIndex: item.IndexOf('\"') + 1,
-                    value: Configuration.Instance.ScheduleConfing!.VsuByUrl));
+                    value: Configuration.Instance.ScheduleConfing!.WebsiteUrl));
 
                 sb.Append(Environment.NewLine);
             }

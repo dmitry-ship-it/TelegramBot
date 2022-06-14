@@ -7,7 +7,7 @@ namespace TelegramBot.Commands
     /// 50% for 'Да' and 50% for 'Нет'.
     /// Commands: <b>/в {}</b>, <b>/вопр {}</b>, <b>/вопрос {}</b>, <b>/q {}</b>, <b>/question {}</b>
     /// </summary>
-    public sealed class QuestionCommand : Command
+    public sealed class QuestionCommand : Command // TODO: Add unit tests
     {
         private readonly string _selectedSticker;
 
