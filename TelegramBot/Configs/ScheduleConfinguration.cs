@@ -1,4 +1,4 @@
 ﻿namespace TelegramBot.Configs
 {
-    public record ScheduleConfinguration(string VsuByUrl, string TimeTableUrl, string[] Commands);
+    public record ScheduleConfinguration(string WebsiteUrl, string ScheduleUrl, string[] Commands);
 }
