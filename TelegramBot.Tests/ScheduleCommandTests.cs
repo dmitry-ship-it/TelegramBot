@@ -33,6 +33,7 @@ namespace TelegramBot.Tests
         [TestCase("<a></a>")]
         [TestCase("<a>where is the link?</a>")]
         [TestCase("<a href=\"/folder/file.txt\">Some txt file</a>")]
+        [TestCase("<a href=\"/folder/filexls\">No file extension</a>")]
         [TestCase("<link href=\"/folder/file.xlsx\">Link?!??</link>")]
         [TestCase("<link src=\"/folder/file.xlsx\">with src</link>")]
         [TestCase("<a ref=\"/folder/file.xlsx\">typo</a>")]

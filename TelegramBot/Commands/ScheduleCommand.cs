@@ -50,7 +50,7 @@ namespace TelegramBot.Commands
 
         private static IEnumerable<string> GetMatches(string s)
         {
-            return Regex.Matches(s, "<a href=\"/.*.xls.?\">.*</a>").Select(item => item.Value);
+            return Regex.Matches(s, "<a href=\"/.*\\.xls.?\">.*</a>").Select(item => item.Value);
         }
 
         private static bool IsException(string match)
