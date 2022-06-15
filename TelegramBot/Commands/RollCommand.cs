@@ -13,7 +13,8 @@ namespace TelegramBot.Commands
 
         public static bool CheckCondition(string input)
         {
-            return string.Equals(input, "/roll", StringComparison.OrdinalIgnoreCase);
+            return string.Equals(input, "/roll", StringComparison.OrdinalIgnoreCase)
+                || input.StartsWith("/roll ", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
