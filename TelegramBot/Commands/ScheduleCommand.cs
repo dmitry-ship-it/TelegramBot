@@ -8,7 +8,7 @@ namespace TelegramBot.Commands
     /// <summary>
     /// Commands: <b>/р</b>, <b>/расп</b>, <b>/расписание</b>, <b>/r</b>, <b>/rasp</b>, <b>/timetable</b>, <b>/schedule</b>
     /// </summary>
-    public sealed class ScheduleCommand : Command // TODO: Add unit tests
+    public sealed class ScheduleCommand : Command
     {
         public override string ReplyMessage => GetSchedule();
 
@@ -25,10 +25,10 @@ namespace TelegramBot.Commands
             using var client = new HttpClient();
             var html = client.GetStringAsync(Configuration.Instance.ScheduleConfing!.ScheduleUrl).Result;
 
-            return ParseHtml(html);
+            return CreateSchedule(html);
         }
 
-        private static string ParseHtml(string html)
+        private static string CreateSchedule(string html)
         {
             var sb = new StringBuilder();
 

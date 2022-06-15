@@ -1,7 +1,7 @@
 
 namespace TelegramBot.Tests
 {
-    public class CommandTests
+    internal class CommandTests
     {
         private static Configuration Cfg => Configuration.Instance;
 

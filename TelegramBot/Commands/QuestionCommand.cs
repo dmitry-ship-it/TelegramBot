@@ -32,8 +32,8 @@ namespace TelegramBot.Commands
         public static bool CheckCondition(string input)
         {
             return Configuration.Instance.QuestionConfig!.Commands.Any(command =>
-                       input.ToLower().StartsWith($"{command} "))
-                    && input.EndsWith('?');
+                   input.ToLower().StartsWith($"{command} "))
+                && input.EndsWith('?');
         }
     }
 }
