@@ -7,6 +7,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramBot.Commands;
 using TelegramBot.Configs;
+using TelegramBot.Logging;
 
 namespace TelegramBot
 {
@@ -19,7 +20,7 @@ namespace TelegramBot
         private Bot()
         {
             _bot = new TelegramBotClient(Configuration.Instance.BotToken!);
-            _logger = new Logging.Logger<Bot>(() => new Logging.LoggerConfiguration());
+            _logger = new Logging.Logger<Bot>();
         }
 
         public static Bot Instance => _instance ??= new();

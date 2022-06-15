@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 
 namespace TelegramBot.Logging
 {
-    public class LoggerConfiguration
+    public sealed class LoggerConfiguration
     {
+        private static LoggerConfiguration? _instance;
+
+        private LoggerConfiguration() { }
+
+        public static LoggerConfiguration Instance => _instance ??= new LoggerConfiguration();
+
         public int EventId { get; set; }
 
         public Dictionary<LogLevel, ConsoleColor> LogLevels { get; set; } = new()
