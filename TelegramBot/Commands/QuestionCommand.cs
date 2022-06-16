@@ -7,7 +7,7 @@ namespace TelegramBot.Commands
     /// 50% for 'Да' and 50% for 'Нет'.
     /// Commands: <b>/в {}</b>, <b>/вопр {}</b>, <b>/вопрос {}</b>, <b>/q {}</b>, <b>/question {}</b>
     /// </summary>
-    public sealed class QuestionCommand : Command // TODO: Add unit tests
+    public sealed class QuestionCommand : Command
     {
         private readonly string _selectedSticker;
 
@@ -32,8 +32,8 @@ namespace TelegramBot.Commands
         public static bool CheckCondition(string input)
         {
             return Configuration.Instance.QuestionConfig!.Commands.Any(command =>
-                   input.ToLower().StartsWith($"{command} "))
-                && input.EndsWith('?');
+                       input.StartsWith($"{command} ", StringComparison.OrdinalIgnoreCase))
+                    && input.EndsWith('?');
         }
     }
 }

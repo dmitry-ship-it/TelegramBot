@@ -3,7 +3,7 @@ using TelegramBot.Configs;
 
 namespace TelegramBot.Commands
 {
-    public class ReplyCommand : Command // TODO: Add unit tests
+    public class ReplyCommand : Command
     {
         public override string ReplyMessage => string.Empty;
 
@@ -12,16 +12,28 @@ namespace TelegramBot.Commands
         public static bool CheckCondition(string input)
         {
             var tag = Configuration.Instance.BotTag!;
+            var tagIndex = input.IndexOf(tag, StringComparison.OrdinalIgnoreCase);
 
-            return input.StartsWith($"{tag} ")
-                || string.Equals(input, tag, StringComparison.OrdinalIgnoreCase)
-                || (input.StartsWith(tag) && ContinuesWithSpecialChar(input, tag));
+            if (tagIndex == -1)
+            {
+                return false;
+            }
+
+            // check chars before and after tag: ',@TagBot?' - True
+            return (tagIndex <= 0 || IsSpecialCharOrSpase(input[tagIndex - 1]))
+                && (tagIndex + tag.Length >= input.Length || IsSpecialCharOrSpase(input[tagIndex + tag.Length]));
         }
 
-        private static bool ContinuesWithSpecialChar(string input, string tag)
+        private static bool IsSpecialCharOrSpase(char c)
         {
-            return char.IsPunctuation(input[tag.Length])
-                || char.IsControl(input[tag.Length]);
+            if (c == '@')
+            {
+                return false;
+            }
+
+            return char.IsWhiteSpace(c)
+                || char.IsPunctuation(c)
+                || char.IsControl(c);
         }
 
         private static InputOnlineFile GetRandomFile()

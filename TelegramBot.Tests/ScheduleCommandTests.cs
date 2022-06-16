@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace TelegramBot.Tests
 {
     internal class ScheduleCommandTests
     {
+        private readonly MethodInfo? _createScheduleMethod = typeof(ScheduleCommand)
+            .GetMethod("CreateSchedule", BindingFlags.NonPublic | BindingFlags.Static);
+
         [TestCase("<a href=\"/folder/file.xls\">Some xls file</a>")]
         [TestCase("<a href=\"/folder/file.xlsx\">Some xlsx file</a>")]
         [TestCase("<a href=\"/folder/file.xlsx\"></a>")]
@@ -18,10 +16,9 @@ namespace TelegramBot.Tests
         public void CreateSchedule_Valid(string html)
         {
             var obj = new ScheduleCommand();
-            var createSchedule = typeof(ScheduleCommand).GetMethod("CreateSchedule", BindingFlags.NonPublic | BindingFlags.Static);
 
-            var scheduleLines = ((string)createSchedule!.Invoke(obj, new[] { html })!)
-                .Split(Environment.NewLine,StringSplitOptions.RemoveEmptyEntries);
+            var scheduleLines = ((string)_createScheduleMethod!.Invoke(obj, new[] { html })!)
+                .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
             Assert.That(scheduleLines, Has.Length.AtLeast(2));
         }
@@ -43,6 +40,8 @@ namespace TelegramBot.Tests
         [TestCase("<a> <href=\"/folder/file.xlsx\">tag</a>")]
         [TestCase("<a href=\"/folder/file.xlsx\">closing tag<a>")]
         [TestCase("<a href=\"/folder/file.xlsx\">closing tag 2</an>")]
+        [TestCase("<a href=\"/folder/file.xlsx\">closing tag 3<a/>")]
+        [TestCase("<a href=\"/folder/file.xlsx\">closing tag 4<a>")]
         [TestCase("<a  href=\"/folder/file.xlsx\">extra space</a>")]
         [TestCase("<a href=\"/folder/file_дфо.xlsx\">дфо is in excetopns</a>")]
         [TestCase("<a href=\"/folder/file_зфпо.xlsx\">зфпо is in also</a>")]
@@ -51,10 +50,9 @@ namespace TelegramBot.Tests
         public void CreateSchedule_Invalid(string html)
         {
             var obj = new ScheduleCommand();
-            var createSchedule = typeof(ScheduleCommand).GetMethod("CreateSchedule", BindingFlags.NonPublic | BindingFlags.Static);
 
-            var scheduleLines = ((string)createSchedule!.Invoke(obj, new[] { html })!)
-                .Split(Environment.NewLine,StringSplitOptions.RemoveEmptyEntries);
+            var scheduleLines = ((string)_createScheduleMethod!.Invoke(obj, new[] { html })!)
+                .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
             Assert.That(scheduleLines, Has.Length.EqualTo(1));
         }

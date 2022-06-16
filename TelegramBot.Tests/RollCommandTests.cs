@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TelegramBot.Tests
+﻿namespace TelegramBot.Tests
 {
     internal class RollCommandTests
     {
@@ -30,6 +24,29 @@ namespace TelegramBot.Tests
             {
                 Assert.That(new RollCommand().ReplySticker, Is.Null);
             }
+        }
+
+        [TestCase("/roll")]
+        [TestCase("/roll ")]
+        [TestCase("/roll gerheh")]
+        [TestCase("/roll \n")]
+        [TestCase("/roll \r\n")]
+        [TestCase("/roll \0")]
+        public void CheckCondition_Returns_True(string input)
+        {
+            Assert.That(RollCommand.CheckCondition(input), Is.True);
+        }
+
+        [TestCase("/rolls")]
+        [TestCase("/roll?")]
+        [TestCase("/rol")]
+        [TestCase("/rol1")]
+        [TestCase("!roll")]
+        [TestCase(".roll")]
+        [TestCase("roll")]
+        public void CheckCondition_Returns_False(string input)
+        {
+            Assert.That(RollCommand.CheckCondition(input), Is.False);
         }
     }
 }

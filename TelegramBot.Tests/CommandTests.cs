@@ -1,4 +1,3 @@
-
 namespace TelegramBot.Tests
 {
     internal class CommandTests
@@ -47,48 +46,71 @@ namespace TelegramBot.Tests
                 message: "Invalid object type.");
         }
 
-        [TestCase("")]
-        [TestCase((string?)null)]
-        [TestCase(",")]
-        [TestCase(", hello")]
-        [TestCase(".")]
-        [TestCase(". hi")]
-        [TestCase("?")]
-        [TestCase("? hey")]
-        [TestCase("!")]
-        [TestCase("! jkilodu")]
-        [TestCase(";")]
-        [TestCase("; htyjmhy")]
-        [TestCase(":")]
-        [TestCase(": oupikjhg")]
-        [TestCase("\n")]
-        [TestCase("\r\n")]
-        [TestCase("\t")]
-        [TestCase("\0")]
-        [TestCase(" ")]
-        [TestCase(" 1")]
-        [TestCase(" lorem")]
-        [TestCase(" ipsum?")]
-        [TestCase(" .")]
-        [TestCase(" .variant")]
-        [TestCase(" \n")]
-        [TestCase(" \r\n")]
-        [TestCase(" \t")]
-        [TestCase(" \0")]
-        public void Create_ValidAddition_Returns_ReplyCommand(string addition)
+        [TestCase(null, null)]
+        [TestCase(null, "")]
+        [TestCase("", null)]
+        [TestCase("", "")]
+        [TestCase("", ",")]
+        [TestCase("", ", hello")]
+        [TestCase("", ".")]
+        [TestCase("", ". hi")]
+        [TestCase("", "?")]
+        [TestCase("", "? hey")]
+        [TestCase("", "!")]
+        [TestCase("", "! jkilodu")]
+        [TestCase("", ";")]
+        [TestCase("", "; htyjmhy")]
+        [TestCase("", ":")]
+        [TestCase("", ": oupikjhg")]
+        [TestCase("", "\n")]
+        [TestCase("", "\r\n")]
+        [TestCase("", "\t")]
+        [TestCase("", "\0")]
+        [TestCase("", " ")]
+        [TestCase("", " 1")]
+        [TestCase("", " lorem")]
+        [TestCase("", " ipsum?")]
+        [TestCase("", " .")]
+        [TestCase("", " .variant")]
+        [TestCase("", " \n")]
+        [TestCase("", " \r\n")]
+        [TestCase("", " \t")]
+        [TestCase("", " \0")]
+        [TestCase("@OtherTag, ", "")]
+        [TestCase("some message ", "")]
+        [TestCase("\n", "")]
+        [TestCase("\0", "")]
+        [TestCase("", "\n")]
+        [TestCase("", "\0")]
+        [TestCase("\n", "\n")]
+        [TestCase("\0", "\0")]
+        [TestCase(".", ".")]
+        [TestCase(",", ",")]
+        [TestCase(";", ";")]
+        public void Create_ValidAddition_Returns_ReplyCommand(string prefix, string suffix)
         {
-            Assert.That(
-                actual: Command.Create(Cfg.BotTag + addition),
-                expression: Is.InstanceOf<ReplyCommand>(),
-                message: "Invalid object type.");
+            Assert.Multiple(() =>
+            {
+                Assert.That(
+                    actual: Command.Create(prefix + Cfg.BotTag + suffix),
+                    expression: Is.InstanceOf<ReplyCommand>(),
+                    message: "Invalid object type.");
+
+                Assert.That(
+                    actual: Command.Create(prefix + Cfg.BotTag!.ToLower() + suffix),
+                    expression: Is.InstanceOf<ReplyCommand>(),
+                    message: "Invalid object type.");
+            });
         }
 
-        [TestCase("1")]
-        [TestCase("lorem")]
-        [TestCase("ipsum?")]
-        public void Create_ReplyCommand_InvalidAddition_ThrowsArgumentException(string addition)
+        [TestCase("1","1")]
+        [TestCase("1"," ")]
+        [TestCase(" ","1")]
+        [TestCase("@Tag","")]
+        [TestCase("ipsum? ", "@Tag")]
+        public void Create_ReplyCommand_InvalidAddition_ThrowsArgumentException(string prefix, string suffix)
         {
-            Assert.Throws<ArgumentException>(() => Command.Create(Cfg.BotTag + addition));
+            Assert.Throws<ArgumentException>(() => Command.Create(prefix + Cfg.BotTag + suffix));
         }
 
         [TestCase("!roll")]
@@ -112,7 +134,9 @@ namespace TelegramBot.Tests
         [TestCase("/question yutdf")]
         [TestCase("/rolling")]
         [TestCase("/roll1")]
-        [TestCase("/rol1")]
+        [TestCase("@BotTag")]
+        [TestCase("just message")]
+        [TestCase("      ")]
         public void Create_InvalidCommand_ThrowsArgumentException(string command)
         {
             Assert.Throws<ArgumentException>(() => Command.Create(command));
