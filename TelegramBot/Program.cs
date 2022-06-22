@@ -2,8 +2,8 @@
 using TelegramBot;
 using TelegramBot.Configs;
 
-//var main = new Thread(async () =>
-//{
+async void Start()
+{
     // actual run
     var cts = new CancellationTokenSource();
 
@@ -11,25 +11,14 @@ using TelegramBot.Configs;
 
     // wait for closing
     await Task.Delay(-1, cancellationToken: cts.Token);
+}
 
-    //// can be used for commands testing
-    //var c = Command.Create("/р");
-    //Console.WriteLine(c.ReplyMessage);
-//});
-
-//var com = new Thread(() =>
-//{
-//    while (true)
-//    {
-//        if (Console.ReadKey(true).Key == ConsoleKey.R)
-//        {
-//            Configuration.Reset();
-//        }
-//    }
-//});
-
-//main.Start();
-//com.Start();
-
-//main.Join();
-//com.Join();
+try
+{
+    Start();
+}
+catch (IOException)
+{
+    Thread.Sleep(5000);
+    Start();
+}
