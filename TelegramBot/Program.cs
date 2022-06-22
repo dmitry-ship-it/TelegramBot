@@ -2,7 +2,7 @@
 using TelegramBot;
 using TelegramBot.Configs;
 
-async void Start()
+static async Task Run()
 {
     // actual run
     var cts = new CancellationTokenSource();
@@ -11,14 +11,17 @@ async void Start()
 
     // wait for closing
     await Task.Delay(-1, cancellationToken: cts.Token);
+    Console.ReadLine();
 }
+
+start:
 
 try
 {
-    Start();
+    await Run();
 }
-catch (IOException)
+catch (Exception ex)
 {
     Thread.Sleep(5000);
-    Start();
+    goto start;
 }
