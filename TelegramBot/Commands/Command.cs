@@ -10,7 +10,7 @@ namespace TelegramBot.Commands
         {
             if (string.IsNullOrWhiteSpace(s))
             {
-                throw new ArgumentException($"'{s}' is unknown command.");
+                throw new ArgumentNullException(nameof(s));
             }
 
             if (ScheduleCommand.CheckCondition(s))
@@ -28,7 +28,11 @@ namespace TelegramBot.Commands
             else if (ReplyCommand.CheckCondition(s))
             {
                 return new ReplyCommand();
-            }   // add more commands there
+            } // add more commands there
+            else if (CommandFromDictionary.CheckCondition(s))
+            {
+                return new CommandFromDictionary(s);
+            }
             else
             {
                 throw new ArgumentException($"'{s}' is unknown command.");

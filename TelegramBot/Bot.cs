@@ -7,7 +7,6 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramBot.Commands;
 using TelegramBot.Configs;
-using TelegramBot.Logging;
 
 namespace TelegramBot
 {
@@ -25,6 +24,12 @@ namespace TelegramBot
 
         public static Bot Instance => _instance ??= new();
 
+        /// <summary>
+        /// Main update handler.
+        /// </summary>
+        /// <param name="botClient">Telegram bot instance.</param>
+        /// <param name="update">Next update.</param>
+        /// <param name="cancellationToken">Cancellation Token.</param>
         private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             // update handling
@@ -63,21 +68,36 @@ namespace TelegramBot
 
                 _logger.LogInformation($"Command {command.GetType()} executed successfully.");
             }
+            catch (ArgumentException ex)
+            {
+                _logger.LogInformation($"{ex.GetType()}: {ex.Message}");
+            }
             catch (ApiRequestException ex)
             {
                 _logger.LogError($"Telegram API request error: {ex.Message}");
             }
-            catch (Exception ex)
-            {
-                _logger.LogDebug($"{ex.GetType()}: {ex.Message}");
-            }
         }
 
+        /// <summary>
+        /// This method should handle critical errors.
+        /// </summary>
+        /// <param name="botClient">Telegram bot instance.</param>
+        /// <param name="exception">Execption to handle.</param>
+        /// <param name="cancellationToken">Cancellation Token.</param>
         private async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
             // remove creating new task after adding something awaitable there 
             await Task.Factory.StartNew(() =>
-                _logger.LogError($"{exception.GetType()}: {exception.Message}"), cancellationToken);
+            {
+                _logger.LogCritical($"{exception.GetType()}: {exception.Message}");
+                _logger.LogInformation("Restarting Bot...");
+            }, cancellationToken);
+
+            // restart after 1 sec delay
+            await Task.Delay(1000, cancellationToken);
+
+            System.Diagnostics.Process.Start("TelegramBot.exe");
+            Environment.Exit(1);
         }
 
         public void Start(Action<ReceiverOptions>? options = null, CancellationToken cancellationToken = default)
@@ -85,6 +105,7 @@ namespace TelegramBot
             var receiverOptions = new ReceiverOptions();
             options?.Invoke(receiverOptions);
 
+            _logger.LogInformation("Bot started.");
             _bot.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, cancellationToken);
         }
     }

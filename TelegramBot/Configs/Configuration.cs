@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using TelegramBot.Logging;
 
 namespace TelegramBot.Configs
 {
@@ -40,6 +42,8 @@ namespace TelegramBot.Configs
 
         public string? BotTag { get; set; }
 
+        public Dictionary<string, string>? OtherCommands { get; set; }
+
         public ScheduleConfinguration? ScheduleConfing { get; set; }
 
         public QuestionConfinguration? QuestionConfig { get; set; }
@@ -54,5 +58,11 @@ namespace TelegramBot.Configs
 
         public static Configuration Instance =>
             _instance ??= JsonSerializer.Deserialize<Configuration>(File.ReadAllText(_filePath))!;
+
+        public static void Reset()
+        {
+            _instance = null;
+            new Logging.Logger<Configuration>().LogInformation($"Manual {nameof(Configuration)} reset.");
+        }
     }
 }
