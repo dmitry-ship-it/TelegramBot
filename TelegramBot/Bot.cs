@@ -19,7 +19,7 @@ namespace TelegramBot
         private Bot()
         {
             _bot = new TelegramBotClient(Configuration.Instance.BotToken!);
-            _logger = new Logging.Logger<Bot>();
+            _logger = Logging.Logger<Bot>.Instance;
         }
 
         public static Bot Instance => _instance ??= new();

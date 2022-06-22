@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using TelegramBot.Logging;
 
 namespace TelegramBot.Configs
 {
@@ -11,6 +10,9 @@ namespace TelegramBot.Configs
     /// {
     ///   "BotToken": "{TOKEN}",
     ///   "BotTag": "@TagOfSomeBot",
+    ///   "OtherCommands": {
+    ///     "/info": "Available commands:\n\nSchedule: gets schedule from vsu.by\n'/р', '/расп', '/расписание', '/r', '/rasp', '/timetable', '/schedule'\n\nQuestion: returns a response (Yes/No)\n'/в', '/вопр', '/вопрос', '/q', '/question'\n\nRoll: generates random number (1-100)\n'/roll'\n\nOther commands:\n'/info' - prints this info"
+    ///   },
     ///   "ScheduleConfing": {
     ///     "WebsiteUrl": "https://example.com",
     ///     "ScheduleUrl": "https://example.com/folder1/subfolder/schedule.html",
@@ -62,7 +64,7 @@ namespace TelegramBot.Configs
         public static void Reset()
         {
             _instance = null;
-            new Logging.Logger<Configuration>().LogInformation($"Manual {nameof(Configuration)} reset.");
+            Logging.Logger<Configuration>.Instance.LogInformation($"Manual {nameof(Configuration)} reset.");
         }
     }
 }

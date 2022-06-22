@@ -2,18 +2,21 @@
 
 namespace TelegramBot.Logging
 {
-    public class Logger<T> : ILogger<T>
+    public sealed class Logger<T> : ILogger<T>
     {
+        private static Logger<T>? _instance;
         private readonly LoggerConfiguration _loggerConfig = LoggerConfiguration.Instance;
         private const string _logFilePath = "logs.log";
 
-        public Logger()
+        private Logger()
         {
             if (!File.Exists(_logFilePath))
             {
                 File.Create(_logFilePath);
             }
         }
+
+        public static Logger<T> Instance => _instance ??= new Logger<T>();
 
         public IDisposable BeginScope<TState>(TState state) => default!;
 
@@ -37,9 +40,7 @@ namespace TelegramBot.Logging
 
                 // actual write to console and file
                 Console.Write(log);
-
-                // TODO: enable later
-                // File.AppendAllText(_logFilePath, log);
+                File.AppendAllText(_logFilePath, log);
 
                 Console.ForegroundColor = originalColor;
             }
