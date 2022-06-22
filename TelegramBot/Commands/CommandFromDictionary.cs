@@ -2,7 +2,7 @@
 
 namespace TelegramBot.Commands
 {
-    public class CommandFromDictionary : Command
+    public class CommandFromDictionary : Command // TODO: add tests
     {
         public CommandFromDictionary(string commandKey)
         {

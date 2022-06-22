@@ -26,7 +26,6 @@ namespace TelegramBot.Logging
                 return;
             }
 
-
             if (_loggerConfig.EventId == 0 || _loggerConfig.EventId == eventId.Id)
             {
                 var originalColor = Console.ForegroundColor;
@@ -38,7 +37,9 @@ namespace TelegramBot.Logging
 
                 // actual write to console and file
                 Console.Write(log);
-                File.AppendAllText(_logFilePath, log);
+
+                // TODO: enable later
+                // File.AppendAllText(_logFilePath, log);
 
                 Console.ForegroundColor = originalColor;
             }
