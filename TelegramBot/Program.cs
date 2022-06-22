@@ -2,8 +2,8 @@
 using TelegramBot;
 using TelegramBot.Configs;
 
-var main = new Thread(async () =>
-{
+//var main = new Thread(async () =>
+//{
     // actual run
     var cts = new CancellationTokenSource();
 
@@ -15,21 +15,21 @@ var main = new Thread(async () =>
     //// can be used for commands testing
     //var c = Command.Create("/р");
     //Console.WriteLine(c.ReplyMessage);
-});
+//});
 
-var com = new Thread(() =>
-{
-    while (true)
-    {
-        if (Console.ReadKey(true).Key == ConsoleKey.R)
-        {
-            Configuration.Reset();
-        }
-    }
-});
+//var com = new Thread(() =>
+//{
+//    while (true)
+//    {
+//        if (Console.ReadKey(true).Key == ConsoleKey.R)
+//        {
+//            Configuration.Reset();
+//        }
+//    }
+//});
 
-main.Start();
-com.Start();
+//main.Start();
+//com.Start();
 
-main.Join();
-com.Join();
+//main.Join();
+//com.Join();
