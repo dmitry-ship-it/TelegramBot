@@ -2,26 +2,30 @@
 using TelegramBot;
 using TelegramBot.Configs;
 
-static async Task Run()
+var main = new Thread(async () =>
 {
-    // actual run
     var cts = new CancellationTokenSource();
 
+    // actual run
     Bot.Instance.Start(null, cts.Token);
 
     // wait for closing
     await Task.Delay(-1, cancellationToken: cts.Token);
-    Console.ReadLine();
-}
+});
 
-start:
+var com = new Thread(() =>
+{
+    while (true)
+    {
+        if (Console.ReadKey(true).Key == ConsoleKey.R)
+        {
+            Configuration.Reset();
+        }
+    }
+});
 
-try
-{
-    await Run();
-}
-catch (Exception ex)
-{
-    Thread.Sleep(5000);
-    goto start;
-}
+main.Start();
+com.Start();
+
+main.Join();
+com.Join();
