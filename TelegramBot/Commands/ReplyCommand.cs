@@ -1,15 +1,22 @@
 ﻿using Telegram.Bot.Types.InputFiles;
+using TelegramBot.Commands.Abstract;
 using TelegramBot.Configs;
 
 namespace TelegramBot.Commands
 {
-    public class ReplyCommand : Command
+    public sealed class ReplyCommand : Command
     {
+        private static ReplyCommand? _instance;
+
+        private ReplyCommand() { }
+
+        public static ReplyCommand Instance => _instance ??= new ReplyCommand();
+
         public override string ReplyMessage => string.Empty;
 
         public override InputOnlineFile? ReplySticker => GetRandomFile();
 
-        public static bool CheckCondition(string input)
+        public override bool IsMatch(string input)
         {
             var tag = Configuration.Instance.BotTag!;
             var tagIndex = input.IndexOf(tag, StringComparison.OrdinalIgnoreCase);

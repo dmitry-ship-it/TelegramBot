@@ -5,7 +5,7 @@
         [Test]
         public void ReplySticker_IsNotNull()
         {
-            Assert.That(new ReplyCommand().ReplySticker, Is.Not.Null);
+            Assert.That(ReplyCommand.Instance.ReplySticker, Is.Not.Null);
         }
 
         [TestCase(null, null)]
@@ -29,7 +29,7 @@
         {
             var tag = Configuration.Instance.BotTag!;
 
-            Assert.That(ReplyCommand.CheckCondition(prefix + tag + suffix), Is.True);
+            Assert.That(ReplyCommand.Instance.IsMatch(prefix + tag + suffix), Is.True);
         }
 
         [TestCase("@","@")]
@@ -48,7 +48,7 @@
         {
             var tag = Configuration.Instance.BotTag!;
 
-            Assert.That(ReplyCommand.CheckCondition(prefix + tag + suffix), Is.False);
+            Assert.That(ReplyCommand.Instance.IsMatch(prefix + tag + suffix), Is.False);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace TelegramBot.Configs
     ///   "OtherCommands": {
     ///     "/info": "Available commands:\n\nSchedule: gets schedule from vsu.by\n'/р', '/расп', '/расписание', '/r', '/rasp', '/timetable', '/schedule'\n\nQuestion: returns a response (Yes/No)\n'/в', '/вопр', '/вопрос', '/q', '/question'\n\nRoll: generates random number (1-100)\n'/roll'\n\nOther commands:\n'/info' - prints this info"
     ///   },
-    ///   "ScheduleConfing": {
+    ///   "ScheduleConfig": {
     ///     "WebsiteUrl": "https://example.com",
     ///     "ScheduleUrl": "https://example.com/folder1/subfolder/schedule.html",
     ///     "Commands": [
@@ -46,7 +46,7 @@ namespace TelegramBot.Configs
 
         public Dictionary<string, string>? OtherCommands { get; set; }
 
-        public ScheduleConfinguration? ScheduleConfing { get; set; }
+        public ScheduleConfinguration? ScheduleConfig { get; set; }
 
         public QuestionConfinguration? QuestionConfig { get; set; }
 

@@ -9,7 +9,7 @@
 
             for (var i = 0; i < rolls; i++)
             {
-                var value = int.Parse(new RollCommand().ReplyMessage.Split(Environment.NewLine).Last());
+                var value = int.Parse(RollCommand.Instance.ReplyMessage.Split(Environment.NewLine).Last());
 
                 Assert.That(value, Is.InRange(1, 100));
             }
@@ -22,7 +22,7 @@
 
             for (var i = 0; i < rolls; i++)
             {
-                Assert.That(new RollCommand().ReplySticker, Is.Null);
+                Assert.That(RollCommand.Instance.ReplySticker, Is.Null);
             }
         }
 
@@ -34,7 +34,7 @@
         [TestCase("/roll \0")]
         public void CheckCondition_Returns_True(string input)
         {
-            Assert.That(RollCommand.CheckCondition(input), Is.True);
+            Assert.That(RollCommand.Instance.IsMatch(input), Is.True);
         }
 
         [TestCase("/rolls")]
@@ -46,7 +46,7 @@
         [TestCase("roll")]
         public void CheckCondition_Returns_False(string input)
         {
-            Assert.That(RollCommand.CheckCondition(input), Is.False);
+            Assert.That(RollCommand.Instance.IsMatch(input), Is.False);
         }
     }
 }

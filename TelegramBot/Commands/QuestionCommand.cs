@@ -1,4 +1,5 @@
 ﻿using Telegram.Bot.Types.InputFiles;
+using TelegramBot.Commands.Abstract;
 using TelegramBot.Configs;
 
 namespace TelegramBot.Commands
@@ -9,31 +10,48 @@ namespace TelegramBot.Commands
     /// </summary>
     public sealed class QuestionCommand : Command
     {
-        private readonly string _selectedSticker;
+        private static QuestionCommand? _instance;
 
-        public QuestionCommand()
+        private string? _selectedSticker;
+        private string? _selectedMessage;
+
+        private QuestionCommand()
         {
-            if (Random.Shared.Next(0, 2) == 1)
+            Reroll();
+        }
+
+        public override string? ReplyMessage
+        {
+            get
             {
-                _selectedSticker = Configuration.Instance.QuestionConfig!.YesStickerId;
-                ReplyMessage = "Да";
-            }
-            else
-            {
-                _selectedSticker = Configuration.Instance.QuestionConfig!.NoStickerId;
-                ReplyMessage = "Нет";
+                Reroll();
+                return _selectedMessage;
             }
         }
 
-        public override string ReplyMessage { get; }
+        public override InputOnlineFile? ReplySticker => new(_selectedSticker!);
 
-        public override InputOnlineFile? ReplySticker => new(_selectedSticker);
+        public static QuestionCommand Instance => _instance ??= new QuestionCommand();
 
-        public static bool CheckCondition(string input)
+        public override bool IsMatch(string input)
         {
             return Configuration.Instance.QuestionConfig!.Commands.Any(command =>
                        input.StartsWith($"{command} ", StringComparison.OrdinalIgnoreCase))
                     && input.EndsWith('?');
+        }
+
+        private void Reroll()
+        {
+            if (Random.Shared.Next(0, 2) == 1)
+            {
+                _selectedSticker = Configuration.Instance.QuestionConfig!.YesStickerId;
+                _selectedMessage = "Да";
+            }
+            else
+            {
+                _selectedSticker = Configuration.Instance.QuestionConfig!.NoStickerId;
+                _selectedMessage = "Нет";
+            }
         }
     }
 }

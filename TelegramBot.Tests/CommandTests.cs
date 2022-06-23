@@ -1,3 +1,5 @@
+using TelegramBot.Commands.Abstract;
+
 namespace TelegramBot.Tests
 {
     internal class CommandTests
@@ -7,12 +9,12 @@ namespace TelegramBot.Tests
         [Test]
         public void Create_Returns_ScheduleCommand()
         {
-            var commands = Cfg.ScheduleConfing!.Commands;
+            var commands = Cfg.ScheduleConfig!.Commands;
 
             for (var i = 0; i < commands.Length; i++)
             {
                 Assert.That(
-                    actual: Command.Create(commands[i]),
+                    actual: Command.Factory.Create(commands[i]),
                     expression: Is.InstanceOf<ScheduleCommand>(),
                     message: "Invalid object type.");
             }
@@ -26,7 +28,7 @@ namespace TelegramBot.Tests
             for (var i = 0; i < commands.Length; i++)
             {
                 Assert.That(
-                    actual: Command.Create($"{commands[i]} question ?"),
+                    actual: Command.Factory.Create($"{commands[i]} question ?"),
                     expression: Is.InstanceOf<QuestionCommand>(),
                     message: "Invalid object type.");
             }
@@ -41,7 +43,7 @@ namespace TelegramBot.Tests
         public void Create_Returns_RollCommand(string command)
         {
             Assert.That(
-                actual: Command.Create(command),
+                actual: Command.Factory.Create(command),
                 expression: Is.InstanceOf<RollCommand>(),
                 message: "Invalid object type.");
         }
@@ -92,12 +94,12 @@ namespace TelegramBot.Tests
             Assert.Multiple(() =>
             {
                 Assert.That(
-                    actual: Command.Create(prefix + Cfg.BotTag + suffix),
+                    actual: Command.Factory.Create(prefix + Cfg.BotTag + suffix),
                     expression: Is.InstanceOf<ReplyCommand>(),
                     message: "Invalid object type.");
 
                 Assert.That(
-                    actual: Command.Create(prefix + Cfg.BotTag!.ToLower() + suffix),
+                    actual: Command.Factory.Create(prefix + Cfg.BotTag!.ToLower() + suffix),
                     expression: Is.InstanceOf<ReplyCommand>(),
                     message: "Invalid object type.");
             });
@@ -110,7 +112,7 @@ namespace TelegramBot.Tests
         [TestCase("ipsum? ", "@Tag")]
         public void Create_ReplyCommand_InvalidAddition_ThrowsArgumentException(string prefix, string suffix)
         {
-            Assert.Throws<ArgumentException>(() => Command.Create(prefix + Cfg.BotTag + suffix));
+            Assert.Throws<ArgumentException>(() => Command.Factory.Create(prefix + Cfg.BotTag + suffix));
         }
 
         [TestCase("!roll")]
@@ -139,7 +141,7 @@ namespace TelegramBot.Tests
         [TestCase("      ")]
         public void Create_InvalidCommand_ThrowsArgumentException(string command)
         {
-            Assert.Throws<ArgumentException>(() => Command.Create(command));
+            Assert.Throws<ArgumentException>(() => Command.Factory.Create(command));
         }
     }
 }

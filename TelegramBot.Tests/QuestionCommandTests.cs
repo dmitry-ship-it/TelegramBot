@@ -5,7 +5,7 @@
         [Test]
         public void ReplySticker_IsNotNull()
         {
-            Assert.That(new QuestionCommand().ReplySticker, Is.Not.Null);
+            Assert.That(QuestionCommand.Instance.ReplySticker, Is.Not.Null);
         }
 
         [TestCase("/в ?")] // std cases
@@ -34,7 +34,7 @@
         [TestCase("/q ......?")]
         public void CheckCondition_Returns_True(string input)
         {
-            Assert.That(QuestionCommand.CheckCondition(input), Is.True);
+            Assert.That(QuestionCommand.Instance.IsMatch(input), Is.True);
         }
 
         [TestCase("/q")]
@@ -47,7 +47,7 @@
         [TestCase("/вопр\r\nok?")]
         public void CheckCondition_Returns_False(string input)
         {
-            Assert.That(QuestionCommand.CheckCondition(input), Is.False);
+            Assert.That(QuestionCommand.Instance.IsMatch(input), Is.False);
         }
     }
 }

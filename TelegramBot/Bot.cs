@@ -5,7 +5,7 @@ using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using TelegramBot.Commands;
+using TelegramBot.Commands.Abstract;
 using TelegramBot.Configs;
 
 namespace TelegramBot
@@ -46,13 +46,13 @@ namespace TelegramBot
                     _logger.LogDebug(JsonSerializer.Serialize(update));
                 #endif
 
-                var command = Command.Create(update.Message.Text);
+                var command = Command.Factory.Create(update.Message.Text);
 
                 if (command.ReplySticker is null)
                 {
                     await botClient.SendTextMessageAsync(
                         chatId: update.Message.Chat!,
-                        text: command.ReplyMessage,
+                        text: command.ReplyMessage!,
                         parseMode: ParseMode.Html,
                         replyToMessageId: update.Message.MessageId,
                         cancellationToken: cancellationToken);

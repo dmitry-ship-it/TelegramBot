@@ -15,7 +15,7 @@ namespace TelegramBot.Tests
         [TestCase("<div><p><a href=\"/folder/file.xlsx\"></a></p></div>")]
         public void CreateSchedule_Valid(string html)
         {
-            var obj = new ScheduleCommand();
+            var obj = ScheduleCommand.Instance;
 
             var scheduleLines = ((string)_createScheduleMethod!.Invoke(obj, new[] { html })!)
                 .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
@@ -49,7 +49,7 @@ namespace TelegramBot.Tests
         [TestCase("<a href=\"/folder/file_зФпО.xlsx\">should ignore case</a>")]
         public void CreateSchedule_Invalid(string html)
         {
-            var obj = new ScheduleCommand();
+            var obj = ScheduleCommand.Instance;
 
             var scheduleLines = ((string)_createScheduleMethod!.Invoke(obj, new[] { html })!)
                 .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
