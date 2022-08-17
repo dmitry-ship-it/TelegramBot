@@ -2,8 +2,27 @@
 {
     public sealed class CommandFactory : ICommandFactory
     {
+        private static readonly object syncObject = new();
         private static CommandFactory? _instance;
-        public static CommandFactory Instance => _instance ??= new CommandFactory();
+
+        public static CommandFactory Instance
+        {
+            get
+            {
+                if (_instance is null)
+                {
+                    lock (syncObject)
+                    {
+                        if (_instance is null)
+                        {
+                            _instance = new CommandFactory();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
 
         private CommandFactory() { }
 

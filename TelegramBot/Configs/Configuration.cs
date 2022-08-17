@@ -58,13 +58,32 @@ namespace TelegramBot.Configs
         [NonSerialized]
         private static Configuration? _instance;
 
-        public static Configuration Instance =>
-            _instance ??= JsonSerializer.Deserialize<Configuration>(File.ReadAllText(_filePath))!;
+        [NonSerialized]
+        private static readonly object syncObject = new();
+
+        public static Configuration Instance
+        {
+            get
+            {
+                if (_instance is null)
+                {
+                    lock (syncObject)
+                    {
+                        if (_instance is null)
+                        {
+                            _instance = JsonSerializer.Deserialize<Configuration>(File.ReadAllText(_filePath))!;
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
 
         public static void Reset()
         {
             _instance = null;
-            Logging.Logger<Configuration>.Instance.LogInformation($"Manual {nameof(Configuration)} reset.");
+            Logging.Logger<Configuration>.Instance.LogInformation("Manual {FullObjectName} reset.", nameof(Configuration));
         }
     }
 }

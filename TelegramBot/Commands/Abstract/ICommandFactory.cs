@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TelegramBot.Commands.Abstract
 {
-    internal interface ICommandFactory
+    public interface ICommandFactory
     {
         public Command Create(string input);
     }

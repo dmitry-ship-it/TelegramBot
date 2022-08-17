@@ -6,9 +6,10 @@ namespace TelegramBot.Commands.Abstract
     {
         protected Command() { }
 
-        public static CommandFactory Factory => CommandFactory.Instance;
+        public static ICommandFactory Factory => CommandFactory.Instance;
 
         public abstract string? ReplyMessage { get; }
+
         public abstract InputOnlineFile? ReplySticker { get; }
 
         public abstract bool IsMatch(string input);

@@ -8,9 +8,27 @@ namespace TelegramBot.Commands
     /// </summary>
     public sealed class RollCommand : Command
     {
+        private static readonly object syncObject = new();
         private static RollCommand? _instance;
 
-        public static RollCommand Instance => _instance ??= new RollCommand();
+        public static RollCommand Instance
+        {
+            get
+            {
+                if (_instance is null)
+                {
+                    lock (syncObject)
+                    {
+                        if (_instance is null)
+                        {
+                            _instance = new();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
 
         private RollCommand() { }
 

@@ -6,11 +6,29 @@ namespace TelegramBot.Commands
 {
     public sealed class ReplyCommand : Command
     {
+        private static readonly object syncObject = new();
         private static ReplyCommand? _instance;
 
         private ReplyCommand() { }
 
-        public static ReplyCommand Instance => _instance ??= new ReplyCommand();
+        public static ReplyCommand Instance
+        {
+            get
+            {
+                if (_instance is null)
+                {
+                    lock (syncObject)
+                    {
+                        if (_instance is null)
+                        {
+                            _instance = new();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
 
         public override string ReplyMessage => string.Empty;
 

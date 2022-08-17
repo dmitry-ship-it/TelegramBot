@@ -6,9 +6,24 @@ namespace TelegramBot.Commands
 {
     public sealed class CommandFromDictionary : Command // TODO: add tests
     {
+        private static readonly object syncObject = new();
         private static CommandFromDictionary? _instance;
 
-        public static CommandFromDictionary GetInstance(string input) => _instance ??= new CommandFromDictionary(input);
+        public static CommandFromDictionary GetInstance(string input)
+        {
+            if (_instance is null)
+            {
+                lock (syncObject)
+                {
+                    if (_instance is null)
+                    {
+                        _instance = new(input);
+                    }
+                }
+            }
+
+            return _instance;
+        }
 
         private CommandFromDictionary(string input)
         {

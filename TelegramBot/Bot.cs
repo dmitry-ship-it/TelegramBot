@@ -12,6 +12,8 @@ namespace TelegramBot
 {
     public sealed class Bot
     {
+        private static readonly object syncObject = new();
+
         private static Bot? _instance;
         private readonly ITelegramBotClient _bot;
         private readonly ILogger<Bot> _logger;
@@ -22,7 +24,24 @@ namespace TelegramBot
             _logger = Logging.Logger<Bot>.Instance;
         }
 
-        public static Bot Instance => _instance ??= new();
+        public static Bot Instance
+        {
+            get
+            {
+                if (_instance is null)
+                {
+                    lock (syncObject)
+                    {
+                        if (_instance is null)
+                        {
+                            _instance = new Bot();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
 
         /// <summary>
         /// Main update handler.
@@ -40,11 +59,11 @@ namespace TelegramBot
 
             try
             {
-                _logger.LogInformation($"Message from {update.Message.From}. Content: {update.Message.Text ?? "null"}");
+                _logger.LogInformation("Message from {Sender}. Content: {Content}", update.Message.From, update.Message.Text ?? "null");
 
-                #if DEBUG
-                    _logger.LogDebug(JsonSerializer.Serialize(update));
-                #endif
+#if DEBUG
+                _logger.LogDebug("UpdateSheme", JsonSerializer.Serialize(update));
+#endif
 
                 var command = Command.Factory.Create(update.Message.Text);
 
@@ -66,15 +85,15 @@ namespace TelegramBot
                         cancellationToken: cancellationToken);
                 }
 
-                _logger.LogInformation($"Command {command.GetType()} executed successfully.");
+                _logger.LogInformation("Command {CommandType} executed successfully.", command.GetType());
             }
             catch (ArgumentException ex)
             {
-                _logger.LogInformation($"{ex.GetType()}: {ex.Message}");
+                _logger.LogInformation("{Exception}: {Message}", ex.GetType(), ex.Message);
             }
             catch (ApiRequestException ex)
             {
-                _logger.LogError($"Telegram API request error: {ex.Message}");
+                _logger.LogError("Telegram API request error: {Message}", ex.Message);
             }
         }
 
@@ -89,7 +108,7 @@ namespace TelegramBot
             // remove creating new task after adding something awaitable there 
             await Task.Factory.StartNew(() =>
             {
-                _logger.LogCritical($"{exception.GetType()}: {exception.Message}");
+                _logger.LogCritical("{Exception}: {Message}", exception.GetType(), exception.Message);
                 _logger.LogInformation("Restarting Bot...");
             }, cancellationToken);
 

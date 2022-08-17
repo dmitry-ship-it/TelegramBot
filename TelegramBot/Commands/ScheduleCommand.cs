@@ -11,9 +11,27 @@ namespace TelegramBot.Commands
     /// </summary>
     public sealed class ScheduleCommand : Command
     {
+        private static readonly object syncObject = new();
         private static ScheduleCommand? _instance;
 
-        public static ScheduleCommand Instance => _instance ??= new ScheduleCommand();
+        public static ScheduleCommand Instance
+        {
+            get
+            {
+                if (_instance is null)
+                {
+                    lock (syncObject)
+                    {
+                        if (_instance is null)
+                        {
+                            _instance = new();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
 
         public override string ReplyMessage => GetSchedule();
 

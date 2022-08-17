@@ -14,6 +14,7 @@ namespace TelegramBot.Commands
 
         private string? _selectedSticker;
         private string? _selectedMessage;
+        private static readonly object syncObject = new();
 
         private QuestionCommand()
         {
@@ -31,7 +32,24 @@ namespace TelegramBot.Commands
 
         public override InputOnlineFile? ReplySticker => new(_selectedSticker!);
 
-        public static QuestionCommand Instance => _instance ??= new QuestionCommand();
+        public static QuestionCommand Instance
+        {
+            get
+            {
+                if (_instance is null)
+                {
+                    lock (syncObject)
+                    {
+                        if (_instance is null)
+                        {
+                            _instance = new();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
 
         public override bool IsMatch(string input)
         {
@@ -42,15 +60,18 @@ namespace TelegramBot.Commands
 
         private void Reroll()
         {
-            if (Random.Shared.Next(0, 2) == 1)
+            lock (syncObject)
             {
-                _selectedSticker = Configuration.Instance.QuestionConfig!.YesStickerId;
-                _selectedMessage = "Да";
-            }
-            else
-            {
-                _selectedSticker = Configuration.Instance.QuestionConfig!.NoStickerId;
-                _selectedMessage = "Нет";
+                if (Random.Shared.Next(0, 2) == 1)
+                {
+                    _selectedSticker = Configuration.Instance.QuestionConfig!.YesStickerId;
+                    _selectedMessage = "Да";
+                }
+                else
+                {
+                    _selectedSticker = Configuration.Instance.QuestionConfig!.NoStickerId;
+                    _selectedMessage = "Нет";
+                }
             }
         }
     }
