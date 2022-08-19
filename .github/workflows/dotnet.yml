@@ -8,6 +8,24 @@ on:
     branches: ["master"]
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - run: 'echo "$CONFIG" > TelegramBot/botConfig.json'
+        shell: bash
+        env:
+          CONFIG: ${{secrets.TELEGRAM_BOT_CONFIG}}
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
   run-lint:
     runs-on: ubuntu-latest
     steps:
@@ -22,25 +40,4 @@ jobs:
           VALIDATE_ALL_CODEBASE: true
           DEFAULT_BRANCH: "master"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-      - name: Run Parasoft dotTEST
-        uses: parasoft/run-dottest-action@1.2.3
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 6.0.x
-    - run: 'echo "$CONFIG" > TelegramBot/botConfig.json'
-      shell: bash
-      env:
-        CONFIG: ${{secrets.TELEGRAM_BOT_CONFIG}}
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
 ...

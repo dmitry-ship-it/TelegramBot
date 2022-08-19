@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Update="nlog.config" CopyToOutputDirectory="Always" />
     <None Update="botConfig.json"  CopyToOutputDirectory="Always" />
   </ItemGroup>
