@@ -1,31 +1,46 @@
 ﻿using Telegram.Bot.Types.Enums;
 using TelegramBot;
 using TelegramBot.Configs;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using TelegramBot.Commands.Abstract;
+using TelegramBot.Commands;
 
-var main = new Thread(async () =>
-{
-    var cts = new CancellationTokenSource();
+//Services.Init();
 
-    // actual run
-    Bot.Instance.Start(null, cts.Token);
+//var main = new Thread(async () =>
+//{
+    await Services.Run(args);
+
+//while (Services.Provider is null) ;
+
+// actual run
+//var bot = Services.Provider.GetRequiredService<Bot>();
+//    bot.Start();
 
     // wait for closing
-    await Task.Delay(-1, cancellationToken: cts.Token);
-});
+    //await Task.Delay(-1,
+    //    cancellationToken: Services.Provider.GetRequiredService<CancellationTokenSource>().Token);
+//});
 
-var com = new Thread(() =>
-{
-    while (true)
-    {
-        if (Console.ReadKey(true).Key == ConsoleKey.R)
-        {
-            Configuration.Reset();
-        }
-    }
-});
+//var com = new Thread(() =>
+//{
+//    while (Services.Provider is null) ;
 
-main.Start();
-com.Start();
+//    var cfg = Services.Provider.GetRequiredService<Configuration>();
+//    while (true)
+//    {
+//        if (Console.ReadKey(true).Key == ConsoleKey.R)
+//        {
+//            cfg.Reset();
+//        }
+//    }
+//});
 
-main.Join();
-com.Join();
+
+////main.Start();
+////Thread.Sleep(200);
+//com.Start();
+
+////main.Join();
+//com.Join();

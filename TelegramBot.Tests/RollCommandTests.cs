@@ -1,7 +1,29 @@
-﻿namespace TelegramBot.Tests
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
+using System.Reflection;
+using TelegramBot.Commands.Abstract;
+
+namespace TelegramBot.Tests
 {
     internal class RollCommandTests
     {
+        private ICommand _command;
+
+        [OneTimeSetUp]
+        public void SetUp()
+        {
+            typeof(Services)
+                .GetMethod(
+                    name: "SetupHost",
+                    bindingAttr: BindingFlags.Static | BindingFlags.NonPublic)
+                !.Invoke(null, new[] { Array.Empty<string>() });
+
+            _command = Services.Provider
+                .GetServices<ICommand>()
+                .Single(c =>
+                    c.GetType() == typeof(RollCommand));
+        }
+
         [Test]
         public void ReplyMessage_Valid()
         {
@@ -9,9 +31,9 @@
 
             for (var i = 0; i < rolls; i++)
             {
-                var value = int.Parse(RollCommand.Instance.ReplyMessage.Split(Environment.NewLine).Last());
+                var rolledValue = int.Parse(_command.ReplyMessage!.Split(Environment.NewLine).Last());
 
-                Assert.That(value, Is.InRange(1, 100));
+                Assert.That(rolledValue, Is.InRange(1, 100));
             }
         }
 
@@ -22,7 +44,7 @@
 
             for (var i = 0; i < rolls; i++)
             {
-                Assert.That(RollCommand.Instance.ReplySticker, Is.Null);
+                Assert.That(_command.ReplySticker, Is.Null);
             }
         }
 
@@ -34,7 +56,7 @@
         [TestCase("/roll \0")]
         public void CheckCondition_Returns_True(string input)
         {
-            Assert.That(RollCommand.Instance.IsMatch(input), Is.True);
+            Assert.That(_command.IsMatch(input), Is.True);
         }
 
         [TestCase("/rolls")]
@@ -46,7 +68,7 @@
         [TestCase("roll")]
         public void CheckCondition_Returns_False(string input)
         {
-            Assert.That(RollCommand.Instance.IsMatch(input), Is.False);
+            Assert.That(_command.IsMatch(input), Is.False);
         }
     }
 }

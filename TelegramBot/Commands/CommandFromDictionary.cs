@@ -1,4 +1,6 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Telegram.Bot.Types.InputFiles;
 using TelegramBot.Commands.Abstract;
 using TelegramBot.Configs;
 
@@ -6,28 +8,15 @@ namespace TelegramBot.Commands
 {
     public sealed class CommandFromDictionary : Command // TODO: add tests
     {
-        private static readonly object syncObject = new();
-        private static CommandFromDictionary? _instance;
+        private readonly Configuration _configuration;
+        private readonly ILogger<CommandFromDictionary> _logger;
 
-        public static CommandFromDictionary GetInstance(string input)
+        public CommandFromDictionary(string input ,Configuration configuration, ILogger<CommandFromDictionary> logger)
         {
-            if (_instance is null)
-            {
-                lock (syncObject)
-                {
-                    if (_instance is null)
-                    {
-                        _instance = new(input);
-                    }
-                }
-            }
+            _configuration = configuration;
+            _logger = logger;
 
-            return _instance;
-        }
-
-        private CommandFromDictionary(string input)
-        {
-            ReplyMessage = Configuration.Instance.OtherCommands![input];
+            ReplyMessage = _configuration.OtherCommands![input];
         }
 
         public override string? ReplyMessage { get; }
@@ -41,7 +30,7 @@ namespace TelegramBot.Commands
 
         public static bool CheckMatching(string input)
         {
-            return Configuration.Instance.OtherCommands!.Any(pair =>
+            return Services.Provider.GetRequiredService<Configuration>().OtherCommands!.Any(pair =>
                 string.Equals(pair.Key, input.Trim(), StringComparison.InvariantCultureIgnoreCase));
         }
     }

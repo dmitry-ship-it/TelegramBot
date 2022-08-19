@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace TelegramBot.Configs
@@ -53,37 +54,23 @@ namespace TelegramBot.Configs
         public ReplyConfiguration? ReplyConfig { get; set; }
 
         [NonSerialized]
-        private const string _filePath = "botConfig.json";
+        public const string FilePath = "botConfig.json";
 
-        [NonSerialized]
-        private static Configuration? _instance;
+        //[NonSerialized]
+        //private readonly ILogger<Configuration> _logger;
 
-        [NonSerialized]
-        private static readonly object syncObject = new();
+        //public Configuration(ILogger<Configuration> logger)
+        //{
+        //    _logger = logger;
+        //}
 
-        public static Configuration Instance
+        public void Reset()
         {
-            get
-            {
-                if (_instance is null)
-                {
-                    lock (syncObject)
-                    {
-                        if (_instance is null)
-                        {
-                            _instance = JsonSerializer.Deserialize<Configuration>(File.ReadAllText(_filePath))!;
-                        }
-                    }
-                }
+            //services.GetService(typeof(Logger<Conig>))
 
-                return _instance;
-            }
-        }
-
-        public static void Reset()
-        {
-            _instance = null;
-            Logging.Logger<Configuration>.Instance.LogInformation("Manual {FullObjectName} reset.", nameof(Configuration));
+            Services.Provider
+                .GetRequiredService<ILogger<Configuration>>()
+                .LogInformation("Manual {FullObjectName} reset.", nameof(Configuration));
         }
     }
 }

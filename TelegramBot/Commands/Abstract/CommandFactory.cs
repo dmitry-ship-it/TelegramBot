@@ -1,54 +1,34 @@
-﻿namespace TelegramBot.Commands.Abstract
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using TelegramBot.Configs;
+
+namespace TelegramBot.Commands.Abstract
 {
     public sealed class CommandFactory : ICommandFactory
     {
-        private static readonly object syncObject = new();
-        private static CommandFactory? _instance;
+        private readonly IEnumerable<ICommand> _commands;
+        private readonly Configuration _configuration;
 
-        public static CommandFactory Instance
+        public CommandFactory(IEnumerable<ICommand> commands, Configuration configuration)
         {
-            get
-            {
-                if (_instance is null)
-                {
-                    lock (syncObject)
-                    {
-                        if (_instance is null)
-                        {
-                            _instance = new CommandFactory();
-                        }
-                    }
-                }
-
-                return _instance;
-            }
+            _commands = commands;
+            _configuration = configuration;
         }
 
-        private CommandFactory() { }
-
-        public Command Create(string? input)
+        public ICommand Create(string? input)
         {
             ArgumentNullException.ThrowIfNull(input);
 
-            if (ScheduleCommand.Instance.IsMatch(input))
+            var selected = _commands.SingleOrDefault(command => command.IsMatch(input));
+
+            if (selected is not null)
             {
-                return ScheduleCommand.Instance;
+                return selected;
             }
-            else if (QuestionCommand.Instance.IsMatch(input))
+
+            if (CommandFromDictionary.CheckMatching(input))
             {
-                return QuestionCommand.Instance;
-            }
-            else if (RollCommand.Instance.IsMatch(input))
-            {
-                return RollCommand.Instance;
-            }
-            else if (ReplyCommand.Instance.IsMatch(input))
-            {
-                return ReplyCommand.Instance;
-            } // add more commands there
-            else if (CommandFromDictionary.CheckMatching(input))
-            {
-                return CommandFromDictionary.GetInstance(input);
+                return new CommandFromDictionary(input, _configuration, Services.Provider.GetRequiredService<ILogger<CommandFromDictionary>>());
             }
 
             throw new ArgumentException($"'{input}' is unknown command.");

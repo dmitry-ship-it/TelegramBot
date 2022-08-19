@@ -8,6 +8,6 @@ namespace TelegramBot.Commands.Abstract
 {
     public interface ICommandFactory
     {
-        public Command Create(string input);
+        public ICommand Create(string input);
     }
 }

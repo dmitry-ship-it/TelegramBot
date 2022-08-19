@@ -1,11 +1,34 @@
-﻿namespace TelegramBot.Tests
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+using TelegramBot.Commands.Abstract;
+
+namespace TelegramBot.Tests
 {
     internal class ReplyCommandTests
     {
+        private Configuration _configuration;
+        private ICommand _command;
+
+        [OneTimeSetUp]
+        public void SetUp()
+        {
+            typeof(Services)
+                .GetMethod(
+                    name: "SetupHost",
+                    bindingAttr: BindingFlags.Static | BindingFlags.NonPublic)
+                !.Invoke(null, new[] { Array.Empty<string>() });
+
+            _configuration = Services.Provider.GetRequiredService<Configuration>();
+            _command = Services.Provider
+                .GetServices<ICommand>()
+                .Single(c =>
+                    c.GetType() == typeof(ReplyCommand));
+        }
+
         [Test]
         public void ReplySticker_IsNotNull()
         {
-            Assert.That(ReplyCommand.Instance.ReplySticker, Is.Not.Null);
+            Assert.That(_command.ReplySticker, Is.Not.Null);
         }
 
         [TestCase(null, null)]
@@ -27,9 +50,9 @@
         [TestCase("some message,", ",message")]
         public void CheckCondition_Returns_True(string prefix, string suffix)
         {
-            var tag = Configuration.Instance.BotTag!;
+            var tag = _configuration.BotTag!;
 
-            Assert.That(ReplyCommand.Instance.IsMatch(prefix + tag + suffix), Is.True);
+            Assert.That(_command.IsMatch(prefix + tag + suffix), Is.True);
         }
 
         [TestCase("@","@")]
@@ -46,9 +69,9 @@
         [TestCase(null, "1")]
         public void CheckCondition_Returns_False(string prefix, string suffix)
         {
-            var tag = Configuration.Instance.BotTag!;
+            var tag = _configuration.BotTag!;
 
-            Assert.That(ReplyCommand.Instance.IsMatch(prefix + tag + suffix), Is.False);
+            Assert.That(_command.IsMatch(prefix + tag + suffix), Is.False);
         }
     }
 }

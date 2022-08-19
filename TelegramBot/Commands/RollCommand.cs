@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using Microsoft.Extensions.Logging;
+using Telegram.Bot.Types.InputFiles;
 using TelegramBot.Commands.Abstract;
 
 namespace TelegramBot.Commands
@@ -8,29 +9,12 @@ namespace TelegramBot.Commands
     /// </summary>
     public sealed class RollCommand : Command
     {
-        private static readonly object syncObject = new();
-        private static RollCommand? _instance;
+        private readonly ILogger<RollCommand> _logger;
 
-        public static RollCommand Instance
+        public RollCommand(ILogger<RollCommand> logger)
         {
-            get
-            {
-                if (_instance is null)
-                {
-                    lock (syncObject)
-                    {
-                        if (_instance is null)
-                        {
-                            _instance = new();
-                        }
-                    }
-                }
-
-                return _instance;
-            }
+            _logger = logger;
         }
-
-        private RollCommand() { }
 
         public override string ReplyMessage => $"Случайное число (1-100):{Environment.NewLine}{Random.Shared.Next(1, 101)}";
 

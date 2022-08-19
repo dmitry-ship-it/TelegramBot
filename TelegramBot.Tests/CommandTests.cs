@@ -1,20 +1,36 @@
+using Microsoft.Extensions.DependencyInjection;
 using TelegramBot.Commands.Abstract;
+using System.Reflection;
 
 namespace TelegramBot.Tests
 {
     internal class CommandTests
     {
-        private static Configuration Cfg => Configuration.Instance;
+        private Configuration _configuration;
+        private ICommandFactory _commandFactory;
+
+        [OneTimeSetUp]
+        public void SetUp()
+        {
+            typeof(Services)
+                .GetMethod(
+                    name: "SetupHost",
+                    bindingAttr: BindingFlags.Static | BindingFlags.NonPublic)
+                !.Invoke(null, new[] { Array.Empty<string>() });
+
+            _configuration = Services.Provider.GetRequiredService<Configuration>();
+            _commandFactory = Services.Provider.GetRequiredService<ICommandFactory>();
+        }
 
         [Test]
         public void Create_Returns_ScheduleCommand()
         {
-            var commands = Cfg.ScheduleConfig!.Commands;
+            var commands = _configuration.ScheduleConfig!.Commands;
 
             for (var i = 0; i < commands.Length; i++)
             {
                 Assert.That(
-                    actual: Command.Factory.Create(commands[i]),
+                    actual: _commandFactory.Create(commands[i]),
                     expression: Is.InstanceOf<ScheduleCommand>(),
                     message: "Invalid object type.");
             }
@@ -23,12 +39,12 @@ namespace TelegramBot.Tests
         [Test]
         public void Create_Returns_QuestionCommand()
         {
-            var commands = Cfg.QuestionConfig!.Commands;
+            var commands = _configuration.QuestionConfig!.Commands;
 
             for (var i = 0; i < commands.Length; i++)
             {
                 Assert.That(
-                    actual: Command.Factory.Create($"{commands[i]} question ?"),
+                    actual: _commandFactory.Create($"{commands[i]} question ?"),
                     expression: Is.InstanceOf<QuestionCommand>(),
                     message: "Invalid object type.");
             }
@@ -43,7 +59,7 @@ namespace TelegramBot.Tests
         public void Create_Returns_RollCommand(string command)
         {
             Assert.That(
-                actual: Command.Factory.Create(command),
+                actual: _commandFactory.Create(command),
                 expression: Is.InstanceOf<RollCommand>(),
                 message: "Invalid object type.");
         }
@@ -94,25 +110,25 @@ namespace TelegramBot.Tests
             Assert.Multiple(() =>
             {
                 Assert.That(
-                    actual: Command.Factory.Create(prefix + Cfg.BotTag + suffix),
+                    actual: _commandFactory.Create(prefix + _configuration.BotTag + suffix),
                     expression: Is.InstanceOf<ReplyCommand>(),
                     message: "Invalid object type.");
 
                 Assert.That(
-                    actual: Command.Factory.Create(prefix + Cfg.BotTag!.ToLower() + suffix),
+                    actual: _commandFactory.Create(prefix + _configuration.BotTag!.ToLower() + suffix),
                     expression: Is.InstanceOf<ReplyCommand>(),
                     message: "Invalid object type.");
             });
         }
 
-        [TestCase("1","1")]
-        [TestCase("1"," ")]
-        [TestCase(" ","1")]
-        [TestCase("@Tag","")]
+        [TestCase("1", "1")]
+        [TestCase("1", " ")]
+        [TestCase(" ", "1")]
+        [TestCase("@Tag", "")]
         [TestCase("ipsum? ", "@Tag")]
         public void Create_ReplyCommand_InvalidAddition_ThrowsArgumentException(string prefix, string suffix)
         {
-            Assert.Throws<ArgumentException>(() => Command.Factory.Create(prefix + Cfg.BotTag + suffix));
+            Assert.Throws<ArgumentException>(() => _commandFactory.Create(prefix + _configuration.BotTag + suffix));
         }
 
         [TestCase("!roll")]
@@ -141,7 +157,7 @@ namespace TelegramBot.Tests
         [TestCase("      ")]
         public void Create_InvalidCommand_ThrowsArgumentException(string command)
         {
-            Assert.Throws<ArgumentException>(() => Command.Factory.Create(command));
+            Assert.That(() => _commandFactory.Create(command), Throws.ArgumentException);
         }
     }
 }
