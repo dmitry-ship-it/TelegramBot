@@ -2,9 +2,9 @@ name: tests & lint
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
@@ -32,7 +32,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
       - name: Lint Code Base
@@ -42,8 +41,8 @@ jobs:
           DEFAULT_BRANCH: "master"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v1.6
+      - name: Super-Linter
+        uses: github/super-linter@v4.9.5
         
       - name: Run Parasoft dotTEST
         uses: parasoft/run-dottest-action@1.2.3
