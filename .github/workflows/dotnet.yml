@@ -1,3 +1,4 @@
+---
 name: tests & lint
 
 on:
@@ -7,6 +8,23 @@ on:
     branches: ["master"]
 
 jobs:
+  run-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+  
+      - name: Lint Code Base
+        uses: github/super-linter@v4
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          DEFAULT_BRANCH: "master"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Run Parasoft dotTEST
+        uses: parasoft/run-dottest-action@1.2.3
   build:
     runs-on: ubuntu-latest
     steps:
@@ -25,24 +43,4 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
-  
-  run-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Lint Code Base
-        uses: github/super-linter@v4
-        env:
-          VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: "master"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Super-Linter
-        uses: github/super-linter@v4.9.5
-        
-      - name: Run Parasoft dotTEST
-        uses: parasoft/run-dottest-action@1.2.3
+...
