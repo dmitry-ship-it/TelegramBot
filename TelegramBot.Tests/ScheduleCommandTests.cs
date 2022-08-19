@@ -1,11 +1,30 @@
-﻿using System.Reflection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+using TelegramBot.Commands.Abstract;
 
 namespace TelegramBot.Tests
 {
     internal class ScheduleCommandTests
     {
         private readonly MethodInfo? _createScheduleMethod = typeof(ScheduleCommand)
-            .GetMethod("CreateSchedule", BindingFlags.NonPublic | BindingFlags.Static);
+            .GetMethod("CreateSchedule", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        private ICommand _command;
+
+        [OneTimeSetUp]
+        public void SetUp()
+        {
+            typeof(Services)
+                .GetMethod(
+                    name: "SetupHost",
+                    bindingAttr: BindingFlags.Static | BindingFlags.NonPublic)
+                !.Invoke(null, new[] { Array.Empty<string>() });
+
+            _command = Services.Provider
+                .GetServices<ICommand>()
+                .Single(c =>
+                    c.GetType() == typeof(ScheduleCommand));
+        }
 
         [TestCase("<a href=\"/folder/file.xls\">Some xls file</a>")]
         [TestCase("<a href=\"/folder/file.xlsx\">Some xlsx file</a>")]
@@ -15,9 +34,7 @@ namespace TelegramBot.Tests
         [TestCase("<div><p><a href=\"/folder/file.xlsx\"></a></p></div>")]
         public void CreateSchedule_Valid(string html)
         {
-            var obj = ScheduleCommand.Instance;
-
-            var scheduleLines = ((string)_createScheduleMethod!.Invoke(obj, new[] { html })!)
+            var scheduleLines = ((string)_createScheduleMethod!.Invoke(_command, new[] { html })!)
                 .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
             Assert.That(scheduleLines, Has.Length.AtLeast(2));
@@ -49,9 +66,7 @@ namespace TelegramBot.Tests
         [TestCase("<a href=\"/folder/file_зФпО.xlsx\">should ignore case</a>")]
         public void CreateSchedule_Invalid(string html)
         {
-            var obj = ScheduleCommand.Instance;
-
-            var scheduleLines = ((string)_createScheduleMethod!.Invoke(obj, new[] { html })!)
+            var scheduleLines = ((string)_createScheduleMethod!.Invoke(_command, new[] { html })!)
                 .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
             Assert.That(scheduleLines, Has.Length.EqualTo(1));

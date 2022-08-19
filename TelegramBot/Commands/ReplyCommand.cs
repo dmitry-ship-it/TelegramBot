@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using Microsoft.Extensions.Logging;
+using Telegram.Bot.Types.InputFiles;
 using TelegramBot.Commands.Abstract;
 using TelegramBot.Configs;
 
@@ -6,28 +7,13 @@ namespace TelegramBot.Commands
 {
     public sealed class ReplyCommand : Command
     {
-        private static readonly object syncObject = new();
-        private static ReplyCommand? _instance;
+        private readonly Configuration _configuration;
+        private readonly ILogger<ReplyCommand> _logger;
 
-        private ReplyCommand() { }
-
-        public static ReplyCommand Instance
+        public ReplyCommand(Configuration configuration, ILogger<ReplyCommand> logger)
         {
-            get
-            {
-                if (_instance is null)
-                {
-                    lock (syncObject)
-                    {
-                        if (_instance is null)
-                        {
-                            _instance = new();
-                        }
-                    }
-                }
-
-                return _instance;
-            }
+            _configuration = configuration;
+            _logger = logger;
         }
 
         public override string ReplyMessage => string.Empty;
@@ -36,7 +22,7 @@ namespace TelegramBot.Commands
 
         public override bool IsMatch(string input)
         {
-            var tag = Configuration.Instance.BotTag!;
+            var tag = _configuration.BotTag!;
             var tagIndex = input.IndexOf(tag, StringComparison.OrdinalIgnoreCase);
 
             if (tagIndex == -1)
@@ -45,11 +31,11 @@ namespace TelegramBot.Commands
             }
 
             // check chars before and after tag: ',@TagBot?' - True
-            return (tagIndex <= 0 || IsSpecialCharOrSpase(input[tagIndex - 1]))
-                && (tagIndex + tag.Length >= input.Length || IsSpecialCharOrSpase(input[tagIndex + tag.Length]));
+            return (tagIndex <= 0 || IsSpecialCharOrSpace(input[tagIndex - 1]))
+                && (tagIndex + tag.Length >= input.Length || IsSpecialCharOrSpace(input[tagIndex + tag.Length]));
         }
 
-        private static bool IsSpecialCharOrSpase(char c)
+        private static bool IsSpecialCharOrSpace(char c)
         {
             if (c == '@')
             {
@@ -61,9 +47,9 @@ namespace TelegramBot.Commands
                 || char.IsControl(c);
         }
 
-        private static InputOnlineFile GetRandomFile()
+        private InputOnlineFile GetRandomFile()
         {
-            var fileIDs = Configuration.Instance.ReplyConfig!.FileIDs;
+            var fileIDs = _configuration.ReplyConfig!.FileIDs;
 
             return new(fileIDs[Random.Shared.Next(0, fileIDs.Length)]);
         }

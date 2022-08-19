@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -10,37 +11,19 @@ using TelegramBot.Configs;
 
 namespace TelegramBot
 {
-    public sealed class Bot
+    public sealed class Bot : IHostedService
     {
-        private static readonly object syncObject = new();
-
-        private static Bot? _instance;
         private readonly ITelegramBotClient _bot;
+        private readonly Configuration _configuration;
+        private readonly ICommandFactory _commandFactory;
         private readonly ILogger<Bot> _logger;
 
-        private Bot()
+        public Bot(Configuration configuration, ICommandFactory commandFactory, ILogger<Bot> logger)
         {
-            _bot = new TelegramBotClient(Configuration.Instance.BotToken!);
-            _logger = Logging.Logger<Bot>.Instance;
-        }
-
-        public static Bot Instance
-        {
-            get
-            {
-                if (_instance is null)
-                {
-                    lock (syncObject)
-                    {
-                        if (_instance is null)
-                        {
-                            _instance = new Bot();
-                        }
-                    }
-                }
-
-                return _instance;
-            }
+            _bot = new TelegramBotClient(configuration.BotToken!); // bot;
+            _configuration = configuration;
+            _commandFactory = commandFactory;
+            _logger = logger;
         }
 
         /// <summary>
@@ -62,10 +45,15 @@ namespace TelegramBot
                 _logger.LogInformation("Message from {Sender}. Content: {Content}", update.Message.From, update.Message.Text ?? "null");
 
 #if DEBUG
-                _logger.LogDebug("UpdateSheme", JsonSerializer.Serialize(update));
+                _logger.LogDebug("{UpdateSheme}", JsonSerializer.Serialize(update));
 #endif
 
-                var command = Command.Factory.Create(update.Message.Text);
+                if (update.Message.Text is null)
+                {
+                    return;
+                }
+
+                var command = _commandFactory.Create(update.Message.Text);
 
                 if (command.ReplySticker is null)
                 {
@@ -126,6 +114,16 @@ namespace TelegramBot
 
             _logger.LogInformation("Bot started.");
             _bot.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, cancellationToken);
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            await Task.Factory.StartNew(() => Start(null, cancellationToken), cancellationToken);
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            await Task.Delay(1, cancellationToken);
         }
     }
 }

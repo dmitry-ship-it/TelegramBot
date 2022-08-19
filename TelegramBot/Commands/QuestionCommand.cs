@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types.InputFiles;
+﻿using Microsoft.Extensions.Logging;
+using Telegram.Bot.Types.InputFiles;
 using TelegramBot.Commands.Abstract;
 using TelegramBot.Configs;
 
@@ -10,14 +11,17 @@ namespace TelegramBot.Commands
     /// </summary>
     public sealed class QuestionCommand : Command
     {
-        private static QuestionCommand? _instance;
-
         private string? _selectedSticker;
         private string? _selectedMessage;
-        private static readonly object syncObject = new();
+        private readonly object syncObject = new();
 
-        private QuestionCommand()
+        private readonly Configuration _configuration;
+        private readonly ILogger<QuestionCommand> _logger;
+
+        public QuestionCommand(Configuration configuration, ILogger<QuestionCommand> logger)
         {
+            _configuration = configuration;
+            _logger = logger;
             Reroll();
         }
 
@@ -32,28 +36,9 @@ namespace TelegramBot.Commands
 
         public override InputOnlineFile? ReplySticker => new(_selectedSticker!);
 
-        public static QuestionCommand Instance
-        {
-            get
-            {
-                if (_instance is null)
-                {
-                    lock (syncObject)
-                    {
-                        if (_instance is null)
-                        {
-                            _instance = new();
-                        }
-                    }
-                }
-
-                return _instance;
-            }
-        }
-
         public override bool IsMatch(string input)
         {
-            return Configuration.Instance.QuestionConfig!.Commands.Any(command =>
+            return _configuration.QuestionConfig!.Commands.Any(command =>
                        input.StartsWith($"{command} ", StringComparison.OrdinalIgnoreCase))
                     && input.EndsWith('?');
         }
@@ -64,12 +49,12 @@ namespace TelegramBot.Commands
             {
                 if (Random.Shared.Next(0, 2) == 1)
                 {
-                    _selectedSticker = Configuration.Instance.QuestionConfig!.YesStickerId;
+                    _selectedSticker = _configuration.QuestionConfig!.YesStickerId;
                     _selectedMessage = "Да";
                 }
                 else
                 {
-                    _selectedSticker = Configuration.Instance.QuestionConfig!.NoStickerId;
+                    _selectedSticker = _configuration.QuestionConfig!.NoStickerId;
                     _selectedMessage = "Нет";
                 }
             }

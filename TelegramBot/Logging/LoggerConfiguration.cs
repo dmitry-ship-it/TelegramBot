@@ -9,11 +9,29 @@ namespace TelegramBot.Logging
 {
     public sealed class LoggerConfiguration
     {
+        private static readonly object syncObject = new();
         private static LoggerConfiguration? _instance;
 
         private LoggerConfiguration() { }
 
-        public static LoggerConfiguration Instance => _instance ??= new LoggerConfiguration();
+        public static LoggerConfiguration Instance
+        {
+            get
+            {
+                if (_instance is null)
+                {
+                    lock (syncObject)
+                    {
+                        if (_instance is null)
+                        {
+                            _instance = new();
+                        }
+                    }
+                }
+
+                return _instance;
+            }
+        }
 
         public int EventId { get; set; }
 

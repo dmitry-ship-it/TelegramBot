@@ -2,12 +2,8 @@
 
 namespace TelegramBot.Commands.Abstract
 {
-    public abstract class Command
+    public abstract class Command : ICommand
     {
-        protected Command() { }
-
-        public static ICommandFactory Factory => CommandFactory.Instance;
-
         public abstract string? ReplyMessage { get; }
 
         public abstract InputOnlineFile? ReplySticker { get; }
