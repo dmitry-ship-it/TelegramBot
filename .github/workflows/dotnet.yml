@@ -15,6 +15,10 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
+    - run: 'echo "$CONFIG" > TelegramBot/botConfig.json'
+      shell: bash
+      env:
+        CONFIG: ${{secrets.TELEGRAM_BOT_CONFIG}}
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
