@@ -34,10 +34,7 @@ namespace TelegramBot.Tests
         [TestCase("<div><p><a href=\"/folder/file.xlsx\"></a></p></div>")]
         public void CreateSchedule_Valid(string html)
         {
-            var scheduleLines = ((string)_createScheduleMethod!.Invoke(_command, new[] { html })!)
-                .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-
-            Assert.That(scheduleLines, Has.Length.AtLeast(2));
+            Assert.That(GetScheduleLines(html), Has.Length.AtLeast(2));
         }
 
         [TestCase("")]
@@ -66,10 +63,13 @@ namespace TelegramBot.Tests
         [TestCase("<a href=\"/folder/file_зФпО.xlsx\">should ignore case</a>")]
         public void CreateSchedule_Invalid(string html)
         {
-            var scheduleLines = ((string)_createScheduleMethod!.Invoke(_command, new[] { html })!)
-                .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            Assert.That(GetScheduleLines(html), Has.Length.EqualTo(1));
+        }
 
-            Assert.That(scheduleLines, Has.Length.EqualTo(1));
+        private string[] GetScheduleLines(string rawHtml)
+        {
+            return ((string)_createScheduleMethod!.Invoke(_command, new[] { rawHtml })!)
+                .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

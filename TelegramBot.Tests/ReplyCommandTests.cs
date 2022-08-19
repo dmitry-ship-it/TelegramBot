@@ -55,11 +55,11 @@ namespace TelegramBot.Tests
             Assert.That(_command.IsMatch(prefix + tag + suffix), Is.True);
         }
 
-        [TestCase("@","@")]
-        [TestCase("@","")]
-        [TestCase("","@")]
-        [TestCase("bthinyjrogkl","irntmopf")]
-        [TestCase("bthinyjrogkl","")]
+        [TestCase("@", "@")]
+        [TestCase("@", "")]
+        [TestCase("", "@")]
+        [TestCase("bthinyjrogkl", "irntmopf")]
+        [TestCase("bthinyjrogkl", "")]
         [TestCase("", "irntmopf")]
         [TestCase("oimeuy", ", @Tag")]
         [TestCase("@Tag ", "gyvbunijmk")]

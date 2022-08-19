@@ -11,7 +11,7 @@ namespace TelegramBot.Commands
         private readonly Configuration _configuration;
         private readonly ILogger<CommandFromDictionary> _logger;
 
-        public CommandFromDictionary(string input ,Configuration configuration, ILogger<CommandFromDictionary> logger)
+        public CommandFromDictionary(string input, Configuration configuration, ILogger<CommandFromDictionary> logger)
         {
             _configuration = configuration;
             _logger = logger;
