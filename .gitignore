@@ -364,4 +364,4 @@ FodyWeavers.xsd
 
 # custom
 dotnet6/
-**/*.botConfig.json
+/TelegramBot/botConfig.json
