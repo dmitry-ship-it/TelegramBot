@@ -51,7 +51,7 @@ namespace TelegramBot.Configs
 
             singleton.BotToken = newConfiguration.BotToken;
             singleton.BotTag = newConfiguration.BotTag;
-            singleton.OtherCommands = newConfiguration.OtherCommands; 
+            singleton.OtherCommands = newConfiguration.OtherCommands;
             singleton.ScheduleConfig = newConfiguration.ScheduleConfig;
             singleton.QuestionConfig = newConfiguration.QuestionConfig;
             singleton.ReplyConfig = newConfiguration.ReplyConfig;
