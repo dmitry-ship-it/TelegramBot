@@ -10,12 +10,12 @@ namespace TelegramBot.Configs
     [Serializable]
     public sealed class Configuration
     {
-        public string BotToken { get; private set; } = default!;
-        public string BotTag { get; private set; } = default!;
-        public Dictionary<string, string> OtherCommands { get; private set; } = default!;
-        public ScheduleConfinguration ScheduleConfig { get; private set; } = default!;
-        public QuestionConfinguration QuestionConfig { get; private set; } = default!;
-        public ReplyConfiguration ReplyConfig { get; private set; } = default!;
+        public string BotToken { get; set; } = default!;
+        public string BotTag { get; set; } = default!;
+        public Dictionary<string, string> OtherCommands { get; set; } = default!;
+        public ScheduleConfinguration ScheduleConfig { get; set; } = default!;
+        public QuestionConfinguration QuestionConfig { get; set; } = default!;
+        public ReplyConfiguration ReplyConfig { get; set; } = default!;
 
         public static Configuration LoadConfiguration()
         {
