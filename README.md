@@ -38,10 +38,33 @@ Config file content example (JSON):
   },
   "ReplyConfig": {
     "FileIDs": [
-		"CAACAgIAAx0CRjcaSAACASNiqKpidttxq7EPOyMHVYmG7M8bEgACagEAAhZ8aAMFmkeBMge9nCQE",
+      "CAACAgIAAx0CRjcaSAACASNiqKpidttxq7EPOyMHVYmG7M8bEgACagEAAhZ8aAMFmkeBMge9nCQE",
       "CAACAgIAAx0CRjcaSAACASRiqKttI0CW1Ji4HtfuBJsEgsT_NQACKwADimqUGPXwLlwpdAilJAQ",
       "https://cdn.7tv.app/emote/618302fe8d50b5f26ee7b9bc/4x"
     ]
   }
 }
+```
+
+## Running application
+
+- Clone repository:
+```shell
+git clone https://github.com/dmitry-ship-it/TelegramBot.git
+```
+
+- Move to main project of solution:
+```shell
+cd TelegramBot
+```
+
+- !! Add configuration file there.
+You can create empty file with this command:
+```shell
+echo > botConfig.json
+```
+
+- Run bot in release mode:
+```shell
+dotnet run -c Release
 ```
