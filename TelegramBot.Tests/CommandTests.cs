@@ -12,20 +12,20 @@ namespace TelegramBot.Tests
         [OneTimeSetUp]
         public void SetUp()
         {
-            typeof(Services)
+            typeof(BotHosting)
                 .GetMethod(
                     name: "SetupHost",
                     bindingAttr: BindingFlags.Static | BindingFlags.NonPublic)
                 !.Invoke(null, new[] { Array.Empty<string>() });
 
-            _configuration = Services.Provider.GetRequiredService<Configuration>();
-            _commandFactory = Services.Provider.GetRequiredService<ICommandFactory>();
+            _configuration = BotHosting.ServiceProvider.GetRequiredService<Configuration>();
+            _commandFactory = BotHosting.ServiceProvider.GetRequiredService<ICommandFactory>();
         }
 
         [Test]
         public void Create_Returns_ScheduleCommand()
         {
-            var commands = _configuration.ScheduleConfig!.Commands;
+            var commands = _configuration.ScheduleConfig.Commands;
 
             for (var i = 0; i < commands.Length; i++)
             {
@@ -39,7 +39,7 @@ namespace TelegramBot.Tests
         [Test]
         public void Create_Returns_QuestionCommand()
         {
-            var commands = _configuration.QuestionConfig!.Commands;
+            var commands = _configuration.QuestionConfig.Commands;
 
             for (var i = 0; i < commands.Length; i++)
             {
@@ -115,7 +115,7 @@ namespace TelegramBot.Tests
                     message: "Invalid object type.");
 
                 Assert.That(
-                    actual: _commandFactory.Create(prefix + _configuration.BotTag!.ToLower() + suffix),
+                    actual: _commandFactory.Create(prefix + _configuration.BotTag.ToLower() + suffix),
                     expression: Is.InstanceOf<ReplyCommand>(),
                     message: "Invalid object type.");
             });

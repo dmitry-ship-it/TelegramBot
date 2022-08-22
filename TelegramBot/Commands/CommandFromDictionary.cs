@@ -11,12 +11,15 @@ namespace TelegramBot.Commands
         private readonly Configuration _configuration;
         private readonly ILogger<CommandFromDictionary> _logger;
 
-        public CommandFromDictionary(string input, Configuration configuration, ILogger<CommandFromDictionary> logger)
+        public CommandFromDictionary(
+            string input,
+            Configuration configuration,
+            ILogger<CommandFromDictionary> logger)
         {
             _configuration = configuration;
             _logger = logger;
 
-            ReplyMessage = _configuration.OtherCommands![input];
+            ReplyMessage = _configuration.OtherCommands[input];
         }
 
         public override string? ReplyMessage { get; }
@@ -30,7 +33,9 @@ namespace TelegramBot.Commands
 
         public static bool CheckMatching(string input)
         {
-            return Services.Provider.GetRequiredService<Configuration>().OtherCommands!.Any(pair =>
+            var cfg = BotHosting.ServiceProvider.GetRequiredService<Configuration>();
+
+            return cfg.OtherCommands.Any(pair =>
                 string.Equals(pair.Key, input.Trim(), StringComparison.InvariantCultureIgnoreCase));
         }
     }

@@ -14,14 +14,12 @@ namespace TelegramBot
     public sealed class Bot : IHostedService
     {
         private readonly ITelegramBotClient _bot;
-        private readonly Configuration _configuration;
         private readonly ICommandFactory _commandFactory;
         private readonly ILogger<Bot> _logger;
 
         public Bot(Configuration configuration, ICommandFactory commandFactory, ILogger<Bot> logger)
         {
-            _bot = new TelegramBotClient(configuration.BotToken!); // bot;
-            _configuration = configuration;
+            _bot = new TelegramBotClient(configuration.BotToken); // bot;
             _commandFactory = commandFactory;
             _logger = logger;
         }
@@ -42,10 +40,11 @@ namespace TelegramBot
 
             try
             {
-                _logger.LogInformation("Message from {Sender}. Content: {Content}", update.Message.From, update.Message.Text ?? "null");
+                _logger.LogInformation("Message from {Sender}. Content: {Content}",
+                    update.Message.From, update.Message.Text ?? "null");
 
 #if DEBUG
-                _logger.LogDebug("{UpdateSheme}", JsonSerializer.Serialize(update));
+                _logger.LogDebug("{UpdateScheme}", JsonSerializer.Serialize(update));
 #endif
 
                 if (update.Message.Text is null)
@@ -119,6 +118,7 @@ namespace TelegramBot
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await Task.Factory.StartNew(() => Start(null, cancellationToken), cancellationToken);
+            await Task.Factory.StartNew(() => Configuration.WaitForReset(cancellationToken), cancellationToken);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

@@ -22,7 +22,7 @@ namespace TelegramBot.Commands
 
         public override bool IsMatch(string input)
         {
-            var tag = _configuration.BotTag!;
+            var tag = _configuration.BotTag;
             var tagIndex = input.IndexOf(tag, StringComparison.OrdinalIgnoreCase);
 
             if (tagIndex == -1)
@@ -49,9 +49,12 @@ namespace TelegramBot.Commands
 
         private InputOnlineFile GetRandomFile()
         {
-            var fileIDs = _configuration.ReplyConfig!.FileIDs;
+            var fileIDs = _configuration.ReplyConfig.FileIDs;
+            var selectedFile = fileIDs[Random.Shared.Next(0, fileIDs.Length)];
 
-            return new(fileIDs[Random.Shared.Next(0, fileIDs.Length)]);
+            _logger.LogInformation("Selected file: {FileId}", selectedFile);
+
+            return new(selectedFile);
         }
     }
 }

@@ -15,13 +15,13 @@ namespace TelegramBot.Tests
         [OneTimeSetUp]
         public void SetUp()
         {
-            typeof(Services)
+            typeof(BotHosting)
                 .GetMethod(
                     name: "SetupHost",
                     bindingAttr: BindingFlags.Static | BindingFlags.NonPublic)
                 !.Invoke(null, new[] { Array.Empty<string>() });
 
-            _configuration = Services.Provider.GetRequiredService<Configuration>();
+            _configuration = BotHosting.ServiceProvider.GetRequiredService<Configuration>();
         }
 
         [Test]

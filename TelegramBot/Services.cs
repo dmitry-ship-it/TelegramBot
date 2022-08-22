@@ -5,18 +5,19 @@ using TelegramBot.Commands;
 using TelegramBot.Commands.Abstract;
 using NLog.Extensions.Logging;
 using TelegramBot.Configs;
-using System.Text.Json;
 
 namespace TelegramBot
 {
-    public static class Services
+    public static class BotHosting
     {
-        public static IServiceProvider Provider { get; private set; } = default!;
+        private static IHost? _host;
+
+        public static IServiceProvider ServiceProvider { get; private set; } = default!;
 
         public static async Task Run(string[] args)
         {
-            var host = SetupHost(args);
-            await host.RunAsync();
+            _host = SetupHost(args);
+            await _host.RunAsync();
         }
 
         private static IHost SetupHost(string[] args)
@@ -25,7 +26,7 @@ namespace TelegramBot
                 .ConfigureServices(RegisterServices)
                 .Build();
 
-            Provider = host.Services;
+            ServiceProvider = host.Services;
 
             return host;
         }
@@ -47,18 +48,8 @@ namespace TelegramBot
             services.AddSingleton<ICommand, ReplyCommand>();
             services.AddSingleton<ICommand, RollCommand>();
             services.AddSingleton<ICommand, ScheduleCommand>();
+            services.AddSingleton(Configuration.LoadConfiguration());
 
-            services.AddSingleton(JsonSerializer.Deserialize<Configuration>(
-                File.ReadAllText(Configuration.FilePath))!);
-
-            Thread.Sleep(300);
-
-            services.AddSingleton<CancellationTokenSource>();
-
-            //services.AddSingleton<ITelegramBotClient, TelegramBotClient>(services =>
-            //    );
-
-            //services.AddSingleton<Bot>();
             services.AddHostedService<Bot>();
         }
     }

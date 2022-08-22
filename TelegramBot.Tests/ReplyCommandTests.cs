@@ -12,14 +12,14 @@ namespace TelegramBot.Tests
         [OneTimeSetUp]
         public void SetUp()
         {
-            typeof(Services)
+            typeof(BotHosting)
                 .GetMethod(
                     name: "SetupHost",
                     bindingAttr: BindingFlags.Static | BindingFlags.NonPublic)
                 !.Invoke(null, new[] { Array.Empty<string>() });
 
-            _configuration = Services.Provider.GetRequiredService<Configuration>();
-            _command = Services.Provider
+            _configuration = BotHosting.ServiceProvider.GetRequiredService<Configuration>();
+            _command = BotHosting.ServiceProvider
                 .GetServices<ICommand>()
                 .Single(c =>
                     c.GetType() == typeof(ReplyCommand));
@@ -50,7 +50,7 @@ namespace TelegramBot.Tests
         [TestCase("some message,", ",message")]
         public void CheckCondition_Returns_True(string prefix, string suffix)
         {
-            var tag = _configuration.BotTag!;
+            var tag = _configuration.BotTag;
 
             Assert.That(_command.IsMatch(prefix + tag + suffix), Is.True);
         }
@@ -69,7 +69,7 @@ namespace TelegramBot.Tests
         [TestCase(null, "1")]
         public void CheckCondition_Returns_False(string prefix, string suffix)
         {
-            var tag = _configuration.BotTag!;
+            var tag = _configuration.BotTag;
 
             Assert.That(_command.IsMatch(prefix + tag + suffix), Is.False);
         }

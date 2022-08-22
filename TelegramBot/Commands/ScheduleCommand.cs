@@ -21,7 +21,6 @@ namespace TelegramBot.Commands
             _logger = logger;
         }
 
-
         public override string ReplyMessage => GetSchedule();
 
         public override InputOnlineFile? ReplySticker => null;
@@ -29,7 +28,7 @@ namespace TelegramBot.Commands
         private string GetSchedule()
         {
             using var client = new HttpClient();
-            var html = client.GetStringAsync(_configuration.ScheduleConfig!.ScheduleUrl).Result;
+            var html = client.GetStringAsync(_configuration.ScheduleConfig.ScheduleUrl).Result;
 
             return CreateSchedule(html);
         }
@@ -41,12 +40,12 @@ namespace TelegramBot.Commands
             sb.Append("Расписание:");
             sb.Append(Environment.NewLine);
 
-            foreach (var item in GetMatches(html).Where(item => IsException(item)))
+            foreach (var item in GetMatches(html))
             {
                 sb.Append("> ");
                 sb.Append(item.Insert(
                     startIndex: item.IndexOf('\"') + 1,
-                    value: _configuration.ScheduleConfig!.WebsiteUrl));
+                    value: _configuration.ScheduleConfig.ScheduleUrl.Host));
 
                 sb.Append(Environment.NewLine);
             }
@@ -56,19 +55,23 @@ namespace TelegramBot.Commands
 
         public override bool IsMatch(string input)
         {
-            return _configuration.ScheduleConfig!.Commands.Any(
-                s => string.Equals(s, input, StringComparison.OrdinalIgnoreCase));
+            var commands = _configuration.ScheduleConfig.Commands;
+
+            return commands.Any(command =>
+                string.Equals(command, input, StringComparison.OrdinalIgnoreCase));
         }
 
         private static IEnumerable<string> GetMatches(string s)
         {
-            return Regex.Matches(s, "<a href=\"/.*\\.xls.?\">.*</a>").Select(item => item.Value);
+            return Regex.Matches(s, "<a href=\"/.*\\.xls.?\">.*</a>")
+                .Select(item => item.Value)
+                .Where(s => !IsException(s));
         }
 
         private static bool IsException(string match)
         {
-            return !match.Contains("дфо", StringComparison.OrdinalIgnoreCase)
-                && !match.Contains("зфпо", StringComparison.OrdinalIgnoreCase);
+            return match.Contains("дфо", StringComparison.OrdinalIgnoreCase)
+                || match.Contains("зфпо", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

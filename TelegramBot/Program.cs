@@ -1,1 +1,3 @@
-﻿await TelegramBot.Services.Run(args);
+﻿
+// run application
+await TelegramBot.BotHosting.Run(args);

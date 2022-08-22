@@ -13,7 +13,7 @@ namespace TelegramBot.Commands
     {
         private string? _selectedSticker;
         private string? _selectedMessage;
-        private readonly object syncObject = new();
+        private readonly object _syncObject = new();
 
         private readonly Configuration _configuration;
         private readonly ILogger<QuestionCommand> _logger;
@@ -38,26 +38,31 @@ namespace TelegramBot.Commands
 
         public override bool IsMatch(string input)
         {
-            return _configuration.QuestionConfig!.Commands.Any(command =>
-                       input.StartsWith($"{command} ", StringComparison.OrdinalIgnoreCase))
-                    && input.EndsWith('?');
+            var commands = _configuration.QuestionConfig.Commands;
+
+            return input.EndsWith('?')
+                && commands.Any(command =>
+                       input.StartsWith($"{command} ", StringComparison.OrdinalIgnoreCase));
         }
 
         private void Reroll()
         {
-            lock (syncObject)
+            lock (_syncObject)
             {
                 if (Random.Shared.Next(0, 2) == 1)
                 {
-                    _selectedSticker = _configuration.QuestionConfig!.YesStickerId;
+                    _selectedSticker = _configuration.QuestionConfig.YesStickerId;
                     _selectedMessage = "Да";
                 }
                 else
                 {
-                    _selectedSticker = _configuration.QuestionConfig!.NoStickerId;
+                    _selectedSticker = _configuration.QuestionConfig.NoStickerId;
                     _selectedMessage = "Нет";
                 }
             }
+
+            _logger.LogInformation("Rolled sticker: {StickerId}; Rolled message: {Message}",
+                _selectedSticker, _selectedMessage);
         }
     }
 }

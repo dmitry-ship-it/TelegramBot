@@ -16,7 +16,8 @@ namespace TelegramBot.Commands
             _logger = logger;
         }
 
-        public override string ReplyMessage => $"Случайное число (1-100):{Environment.NewLine}{Random.Shared.Next(1, 101)}";
+        public override string ReplyMessage =>
+            $"Случайное число (1-100):{Environment.NewLine}{Random.Shared.Next(1, 101)}";
 
         public override InputOnlineFile? ReplySticker => null;
 
