@@ -68,3 +68,12 @@ echo > botConfig.json
 ```shell
 dotnet run -c Release
 ```
+
+### Tek stack
+
+- .NET 6
+- Telegram.Bot Nuget package
+- NUnit
+- NLog
+- DI (Microsoft.Extensions.DependencyInjection)
+- Hosting and startup infrastructure (Microsoft.Extensions.Hosting)
